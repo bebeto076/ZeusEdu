@@ -1,97 +1,56 @@
 <?php
 $selectProf = isset($_POST['selectProf'])?$_POST['selectProf']:Null;
 $coursGrp = isset($_POST['coursGrp'])?$_POST['coursGrp']:Null;
+$classe = isset($_POST['classe'])?$_POST['classe']:Null;
+// la date postée dans le formulaire ou la date du jour
+$date = isset($_POST['date'])?$_POST['date']:strftime("%d/%m/%Y");
 
-switch ($mode) {
-	case 'parEleve':
-		$classe = isset($_POST['classe'])?$_POST['classe']:Null;
-		$smarty->assign('classe',$classe);
-		$listeEleves = isset($classe)?$Ecole->listeEleves($classe,'groupe'):Null;
-		$smarty->assign('listeEleves',$listeEleves);
-		$listeClasses = $Ecole->listeGroupes();
-		$smarty->assign("listeClasses", $listeClasses);
-		$matricule = isset($_POST['matricule'])?$_POST['matricule']:Null;
-		$smarty->assign('matricule',$matricule);
-		
-		switch ($etape) {
-			case 'showEleve':
-				$prevNext = $Ecole->prevNext($matricule, $listeEleves);
-				$smarty->assign('prevNext', $prevNext);
-				$listeAbsences = $Presences->absencesEleve($matricule);
-				$smarty->assign('listeAbsences',$listeAbsences);
-				$Eleve = new Eleve($matricule);
-				$detailsEleve = $Eleve->getDetailsEleve();
-				$nomEleve = $detailsEleve['prenom']." ".$detailsEleve['nom'];
-				$smarty->assign('nomEleve',$nomEleve);
-				$listePeriodes = $Presences->lirePeriodesCours();
-				$smarty->assign('listePeriodes',$listePeriodes);
-				$smarty->assign('corpsPage','absencesEleve');
+$listePeriodes = $Presences->lirePeriodesCours();
+$smarty->assign('listePeriodes',$listePeriodes);
+$lesPeriodes = range(1, count($listePeriodes));
+$smarty->assign('lesPeriodes', $lesPeriodes);
 
-				break;
-			default:
-				$smarty->assign('etape','showEleve');
-				}
-		$smarty->assign('action', $action);
-		$smarty->assign('mode', $mode);
-		$smarty->assign('selecteur','selectClasseEleve');
-		break;
-	case 'enregistrer':
-		if ($coursGrp)
-			$listeEleves = $Ecole->listeElevesCours($coursGrp,'alpha');
-		$nb = $Presences->enregistrerAbsences($_POST, $listeEleves);
-		$smarty->assign("message", array(
-					'title'=> SAVE,
-					'texte'=>sprintf(NBSAVE,$nb)
-					));
-		// break;	pas de break
-	default:
-		$listePeriodes = $Presences->lirePeriodesCours();
-		$smarty->assign("listePeriodes",$listePeriodes);
-		$smarty->assign("lesPeriodes", range(1, count($listePeriodes)));
-		
-		$freePeriode = isset($_POST['freePeriode'])?$_POST['freePeriode']:Null;
-		// retrouver la période actuelle à partir de l'heure ou accepter l'heure si heure libre souhaitée
-		if ($freePeriode == Null)
-			$periode = $Presences->periodeActuelle($listePeriodes);
-			else $periode = isset($_POST['periode'])?$_POST['periode']:Null;
-			
-		$freeDate = isset($_POST['freeDate'])?$_POST['freeDate']:Null;
-		// retrouver la date de travail à partir de la date du jour ou accepter la date postés si date libre souhaitée
-		if ($freeDate == Null) 
-			$date = strftime("%d/%m/%Y");
-			else $date = isset($_POST['date'])?$_POST['date']:Null;
-		
-		$jourSemaine = strftime('%A',$Application->dateFR2Time($date));
-			
-		if ($selectProf) {
-			$smarty->assign("selectProf", $selectProf);
-			$listeCoursGrp = $Ecole->listeCoursProf($selectProf);
-				if ($coursGrp) {
-					if (!(isset($listeEleves))) {
-						// si on a enregistré, $listeEleves est déjà connu
-						$listeEleves = $Ecole->listeElevesCours($coursGrp,'alpha');
-						}
-					$smarty->assign('listeEleves',$listeEleves);
-					$smarty->assign('nbEleves',count($listeEleves));
-					$smarty->assign('corpsPage', 'feuilleAbsences');
-				}
+$smarty->assign('listeProfs', $Ecole->listeProfs(true));
+
+if (!empty($listePeriodes)) {
+	$periode = isset($_POST['periode'])?$_POST['periode']:$Presences->periodeActuelle($listePeriodes);
+	$smarty->assign('periode',$periode);
+
+	// l'utilisateur peut-il changer la date de prise de présence?	
+	$freeDate = isset($_POST['freeDate'])?$_POST['freeDate']:Null;
+	// retrouver la date de travail à partir de la date du jour ou accepter la date postés si date libre souhaitée
+	if ($freeDate == Null) 
+		$date = strftime("%d/%m/%Y");
+	$smarty->assign('freeDate', $freeDate);
+	// $smarty->assign('freePeriode',$freePeriode);
+	$jourSemaine = strftime('%A',$Application->dateFR2Time($date));
+	$smarty->assign('jourSemaine',$jourSemaine);	
+	
+	$smarty->assign('date',$date);
+	switch ($mode) {
+		case 'tituCours':
+			require('presencesTituCours.inc.php');
+			break;
+		case 'eleve':
+			require('presencesEleve.inc.php');
+			break;
+		case 'cours':
+			require('presencesCours.inc.php');
+			break;
+		case 'classe':
+			require('presencesClasse.inc.php');
+			break;
+		default:
+			$listeCoursGrp = $Ecole->listeCoursProf($acronyme);
+			if (count($listeCoursGrp) > 0)
+				require('presencesTituCours.inc.php');				
+			break;
 			}
-			else $listeCoursGrp = Null;
-		$smarty->assign("listeProfs", $Ecole->listeProfs(true));
-		$smarty->assign("date",$date);
-		$smarty->assign("listeCoursGrp", $listeCoursGrp);
-		$smarty->assign('freeDate', $freeDate);
-		$smarty->assign("freePeriode",$freePeriode);
-		$smarty->assign("periode",$periode);
-		$smarty->assign("jourSemaine",$jourSemaine);
-		$smarty->assign("selecteur", "selectHeureProfCours");
-		if ($coursGrp) {
-			$listeAbsences = $Presences->lireAbsences($date, $coursGrp);
-			$smarty->assign("coursGrp", $coursGrp);
-		}
-		$listeAbsences = isset($listeAbsences)?$listeAbsences:Null;
-		$smarty->assign("listeAbsences", $listeAbsences);
-		break;
-}	
-
+	}
+	else {
+		$smarty->assign('message', array(
+			'title'=>'AVERTISSEMENT',
+			'texte'=>"Les périodes de cours ne sont pas encore définies. Contactez l'administrateur",
+			'urgence'=>'danger'));
+	}
 ?>

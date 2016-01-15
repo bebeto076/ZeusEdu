@@ -1,8 +1,7 @@
 <?php
-
 $coursGrp = isset($_POST['coursGrp'])?$_POST['coursGrp']:Null;
 $bulletin = isset($_REQUEST['bulletin'])?$_REQUEST['bulletin']:PERIODEENCOURS;
-$matricule = isset($_POST['matricule'])?$_POST['matricule']:Null;
+$matricule = isset($_REQUEST['matricule'])?$_REQUEST['matricule']:Null;
 $smarty->assign('matricule',$matricule);
 if ($mode == 'enregistrer') {
 	$data = $BullTQ->organiserData($_POST);
@@ -16,14 +15,14 @@ if (isset($coursGrp)) {
 	$smarty->assign('libelleCours', $libelleCours);
 	$smarty->assign('listeEleves', $listeEleves);
 	$smarty->assign('coursGeneral', $BullTQ->estGeneral($coursGrp));
-	
+
 	$listeCommentaires = $BullTQ->listeCommentaires($listeEleves, $coursGrp);
 	$smarty->assign('listeCommentaires', $listeCommentaires);
 
 	$cours = $BullTQ->coursDeCoursGrp($coursGrp);
 	$listeCompetences = $BullTQ->listeCompetencesListeCours($cours);
 	$smarty->assign('listeCompetences', $listeCompetences);
-	
+
 	$listeCotesGlobales = $BullTQ->listeCotesGlobales($coursGrp, $bulletin);
 	$listeCotesGlobales = isset($listeCotesGlobales[$bulletin][$coursGrp])?$listeCotesGlobales[$bulletin][$coursGrp]:Null;
 	$smarty->assign('cotesGlobales', $listeCotesGlobales);
@@ -37,12 +36,11 @@ if (isset($coursGrp)) {
 $listeCours = $user->listeCoursProf("'TQ'");
 
 $smarty->assign('listeCours',$listeCours);
-$smarty->assign("coursGrp",$coursGrp);
-$smarty->assign("nbBulletins", NBPERIODES);
-$smarty->assign("bulletin", $bulletin);
+$smarty->assign('coursGrp',$coursGrp);
+$smarty->assign('nbBulletins', NBPERIODES);
+$smarty->assign('bulletin', $bulletin);
 
 $smarty->assign('action',$action);
-// $smarty->assign('mode',$mode);
-$smarty->assign('selecteur', 'selectBulletinCours');
+$smarty->assign('selecteur', 'selecteurs/selectBulletinCours');
 
 ?>

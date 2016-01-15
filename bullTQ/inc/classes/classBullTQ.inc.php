@@ -11,7 +11,7 @@ class bullTQ {
 
     /*
      * __construct
-     * @param 
+     * @param
      */
     function __construct() {
 
@@ -48,7 +48,7 @@ class bullTQ {
 		return utf8_decode($argument);
 		}
 
-	
+
 	/***
 	 * retourne une valeur booleenne selon que le cours est "général" ou fait partie de l'option
 	 * @param $coursGrp
@@ -68,7 +68,7 @@ class bullTQ {
 		if (is_array($listeCoursGrp))
 			$listeCoursGrpString = "'" . implode("','", array_keys($listeCoursGrp)) . "'";
 			else $listeCoursGrpString = "'".$listeCoursGrp."'";
-		
+
         $connexion = Application::connectPDO (SERVEUR, BASE, NOM, MDP);
 		$sql = "SELECT coursGrp, matricule, Tj, Ex, periode, global ";
 		$sql .= "FROM ".PFX."bullTQCotesGlobales ";
@@ -88,7 +88,7 @@ class bullTQ {
 		return $listeCotes;
 		}
 
-	
+
 	/**
 	 * renvoie la liste des cotes des cours généraux pour une liste de cours donnée, une liste d'élèves donnée et un bulletin donné
 	 * @param $listeCoursGrp : la liste des coursGroupes dont on veut les cotes
@@ -130,7 +130,7 @@ class bullTQ {
 	/***
 	 * retourne toutes les informations (libelle, heures, statut,...) d'un coursGrp passé en argument
 	 * @param $coursGrp
-	 * @return $array 
+	 * @return $array
 	 */
 	public function intituleCours($coursGrp) {
 		$cours = $this->coursDeCoursGrp($coursGrp);
@@ -173,7 +173,7 @@ class bullTQ {
 		if (is_array($listeCoursGrp))
 			$listeCoursGrpString = "'" . implode("','", array_keys($listeCoursGrp)) . "'";
 			else $listeCoursGrpString = "'" . $listeCoursGrp . "'";
-		
+
 		$connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
 		$sql = "SELECT coursGrp, matricule, bulletin, commentaire ";
 		$sql .= "FROM " . PFX . "bullTQCommentProfs ";
@@ -190,7 +190,7 @@ class bullTQ {
 		Application::DeconnexionPDO($connexion);
 		return $listeCommentaires;
 	}
-	
+
 	/*
 	 * organisation rationnelle des cotes: une ligne par compétence extraite du formulaire de rédaction du bulletin par cours
 	 * @param $post
@@ -246,13 +246,13 @@ class bullTQ {
 					break;
 			}
 		}
-		return array('cotes' => $listeCotesParCompetences, 
-					 'periode' => $listeCotesPeriode, 
+		return array('cotes' => $listeCotesParCompetences,
+					 'periode' => $listeCotesPeriode,
 					 'commentaires' => $listeCommentaires
 					);
-		
+
 		}
-		
+
 	/**
 	 * Enregistrement effectif des données réorganisées par la fonction organiserData
 	 * @param $data
@@ -278,7 +278,7 @@ class bullTQ {
 				$nbResultats += $requete->execute($data);
 				}
 			}
-			
+
 		// traitement des cotes globales de période
 		$sql = "INSERT INTO ".PFX."bullTQCotesGlobales SET ";
 		$sql .= "matricule=:matricule, coursGrp=:coursGrp, bulletin=:bulletin, TJ=:Tj, Ex=:Ex, periode=:periode, global=:global ";
@@ -293,7 +293,7 @@ class bullTQ {
 			$data = array(':matricule'=>$matricule, ':coursGrp'=>$coursGrp, ':bulletin'=>$bulletin, ':Tj'=>$Tj, ':Ex'=>$Ex, ':periode'=>$periode, ':global'=>$global);
 			$nbResultats += $requete->execute($data);
 			}
-		
+
 		// traitement des commentaires
 		$sql = "INSERT INTO ".PFX."bullTQCommentProfs SET ";
 		$sql .= "matricule=:matricule, coursGrp=:coursGrp, bulletin=:bulletin, commentaire=:commentaire ";
@@ -303,7 +303,7 @@ class bullTQ {
 			$data = array(':matricule'=>$matricule,':coursGrp'=>$coursGrp, ':bulletin'=>$bulletin, ':commentaire'=>$commentaire);
 			$nbResultats += $requete->execute($data);
 		}
-		
+
 		Application::DeconnexionPDO($connexion);
 		return $nbResultats;
 	}
@@ -334,7 +334,7 @@ class bullTQ {
 	 * @return array : liste des cours suivis par la liste des élèves à la période $bulletin
 	 */
 	public function listeCoursGrpEleves($listeEleves) {
-		if (is_array($listeEleves)) 
+		if (is_array($listeEleves))
 			$listeMatricules = implode(",", array_keys($listeEleves));
 		else $listeMatricules = $listeEleves;
 
@@ -345,7 +345,7 @@ class bullTQ {
 		$sql .= "JOIN ".PFX."cours ON (".PFX."cours.cours = SUBSTR(coursGrp, 1,LOCATE('-',coursGrp)-1)) ";
 		$sql .= "JOIN ".PFX."statutCours ON (".PFX."statutCours.cadre = ".PFX . "cours.cadre) ";
 		$sql .= "JOIN ".PFX."bullTQtypologie ON (".PFX."bullTQtypologie.coursGrp = cours) ";
-		// LEFT JOIN pour les cas où un élève aurait été affecté à un cours qui n'existe plus dans la table des profs		
+		// LEFT JOIN pour les cas où un élève aurait été affecté à un cours qui n'existe plus dans la table des profs
 		$sql .= "LEFT JOIN ".PFX."profsCours ON (".PFX."profsCours.coursGrp = ".PFX."elevesCours.coursGrp) ";
 		$sql .= "LEFT JOIN ".PFX."profs ON (".PFX."profs.acronyme = ".PFX."profsCours.acronyme) ";
 		$sql .= "WHERE matricule IN ($listeMatricules) ";
@@ -432,7 +432,7 @@ class bullTQ {
 		Application::DeconnexionPDO($connexion);
 		return $listeRemarques;
 	}
-	
+
 	/***
 	 * retourne les mentions globales à faire figurer au bulletin
 	 * @param $bulletin : numéro du bulletin
@@ -462,23 +462,23 @@ class bullTQ {
 		Application::DeconnexionPDO($connexion);
 		return $mentions;
 		}
-	
+
 	/***
 	 * renvoie la liste de toutes les cotes globales pour tous les cours suivis par un élève dont on fournit le matricule
 	 * @param $listeCours
 	 * @param $matricule
-	 * @return array 
+	 * @return array
 	 */
 	public function globalAnneeEnCours($listeCoursGrp, $matricule) {
 		if (is_array($listeCoursGrp))
 			$listeCoursGrpString = "'" . implode("','", array_keys($listeCoursGrp)) . "'";
 		else $listeCoursGrpString = "'" . $listeCoursGrp . "'";
-		
+
 		$connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
 		$sql = "SELECT coursGrp, bulletin, global ";
 		$sql .= "FROM ".PFX."bullTQCotesGlobales ";
 		$sql .= "WHERE coursGrp IN ($listeCoursGrpString) AND matricule = '$matricule' ";
-		
+
 		$resultat = $connexion->query($sql);
 		$listeCotesGlobales = array();
 		if ($resultat) {
@@ -512,22 +512,22 @@ class bullTQ {
 				$classe = $ligne['classe'];
 				$liste[$classe] = $classe;
 				}
-			} 
+			}
 		Application::DeconnexionPDO($connexion);
 		// suppression des entrées vides...
 		$liste = array_filter($liste);
 		return $liste;
 	}
-	
+
 	/***
 	 * retire le groupe d'un cours dont on passe le coursGroupe
 	 * @param $coursGrp
-	 * @return string : cours 
+	 * @return string : cours
 	 */
 	private function coursSansGrp($coursGrp) {
 		return substr($coursGrp, 0, strpos($coursGrp, "-", 0));
 	}
-	
+
 	/***
 	 * retourne la liste ordonnées de toutes les compétences pour tous les cours passé en argument
 	 * @param $listeCours
@@ -540,8 +540,8 @@ class bullTQ {
 		$connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
 		$sql = "SELECT id, cours, ordre, libelle ";
 		$sql .= "FROM " . PFX . "bullTQCompetences ";
-		$sql .= "WHERE cours IN ($listeCoursString)";
-        $sql .= "ORDER BY ordre";
+		$sql .= "WHERE cours IN ($listeCoursString) ";
+        $sql .= "ORDER BY ordre ";
 		$resultat = $connexion->query($sql);
 		$listeCompetences = array();
 		if ($resultat) {
@@ -594,7 +594,7 @@ class bullTQ {
 		Application::DeconnexionPDO($connexion);
 		return $listeCompetences;
 	}
-	
+
     /**
      * liste structurée des profs liés à une liste de coursGrp (liste indexée par coursGrp)
      * @param array $listeCoursGrp
@@ -646,14 +646,14 @@ class bullTQ {
 		$nomsPeriodes = array_combine(range(1,NBPERIODES), explode(',',NOMSPERIODES));
 		if ($delibes) {
 			$periodesDelibes = explode(',', str_replace(' ','',PERIODESDELIBES));
-			foreach ($nomsPeriodes as $no=>$unePeriode) 
+			foreach ($nomsPeriodes as $no=>$unePeriode)
 				if (!(in_array($no,$periodesDelibes)))
 					unset($nomsPeriodes[$no]);
 			}
 		return $nomsPeriodes;
 	}
-	
-	
+
+
 	/***
 	 * renvoie la liste des cotes de situations pour la période demandée
 	 * @param $classe : string la classe concernée
@@ -682,8 +682,8 @@ class bullTQ {
 		Application::deconnexionPDO($connexion);
 		return $listeSituations;
 		}
-	
-    
+
+
 	/**
 	* retourne la liste de tous les cours qui se donnent dans une classe
 	* chaque ligne contient
@@ -723,8 +723,8 @@ class bullTQ {
 		Application::DeconnexionPDO($connexion);
 		return $liste;
 		}
-		
-		
+
+
 	/***
      * création d'une image d'un texte sur base des paramètres
      * @param $largeur
@@ -773,9 +773,9 @@ class bullTQ {
             }
 		return $liste;
     }
-	
-	
-	/*** 
+
+
+	/***
 	 * Enregistre les informations passées dans le formulaire posté
 	 * @param post
 	 * @return boolean
@@ -819,15 +819,15 @@ class bullTQ {
 					break;
 				default:
 					// wtf
-					break;	
+					break;
 				}
 			}
 		Application::DeconnexionPDO($connexion);
 		}
 	return $nb;
 	}
-	
-	
+
+
 	/***
 	 * retourne l'ensemble des cotes d'un élève dont on fournit le matricule
 	 * @param $matricule
@@ -839,13 +839,13 @@ class bullTQ {
 		$sql = "SELECT DISTINCT cg.coursGrp, cg.matricule, cg.bulletin, global, ";
 		$sql .= "SUBSTR(cg.coursGrp, 1, LOCATE('-',cg.coursGrp)-1) AS cours, libelle, nbheures, sc.statut, ";
 		$sql .= "p.acronyme, p.nom, p.prenom ";
-		$sql .= "FROM didac_bullTQCotesGlobales AS cg ";
-		$sql .= "JOIN didac_profsCours AS pc ON (pc.coursGrp = cg.coursGrp) ";
-		$sql .= "JOIN didac_profs AS p ON (p.acronyme = pc.acronyme) ";
-		$sql .= "JOIN didac_cours AS c ON (c.cours = SUBSTR(cg.coursGrp, 1, LOCATE('-',cg.coursGrp)-1)) ";
-		$sql .= "JOIN didac_statutCours AS sc ON (sc.cadre = c.cadre) ";
+		$sql .= "FROM ".PFX."bullTQCotesGlobales AS cg ";
+		$sql .= "JOIN ".PFX."profsCours AS pc ON (pc.coursGrp = cg.coursGrp) ";
+		$sql .= "JOIN ".PFX."profs AS p ON (p.acronyme = pc.acronyme) ";
+		$sql .= "JOIN ".PFX."cours AS c ON (c.cours = SUBSTR(cg.coursGrp, 1, LOCATE('-',cg.coursGrp)-1)) ";
+		$sql .= "JOIN ".PFX."statutCours AS sc ON (sc.cadre = c.cadre) ";
 		$sql .= "WHERE cg.matricule = '$matricule' AND bulletin IN ($listePeriodesString) ";
-		$sql .= "ORDER BY cg.bulletin, statut, nbheures, rang ";
+		$sql .= "ORDER BY cg.bulletin, statut, nbheures, libelle, rang ";
 		$resultat = $connexion->query($sql);
 		$cotesEleve = array();
 		if ($resultat) {
@@ -857,16 +857,16 @@ class bullTQ {
 				}
 			}
 		Application::DeconnexionPDO ($connexion);
-		return $cotesEleve;	
+		return $cotesEleve;
 	}
-	
+
 	/***
 	 * retourne un tableau statistique des différentes cotes trouvées
-	 * le type peut être 
+	 * le type peut être
 	 * 	'' = tout venant
 	 *  'stage' = cotes de stage uniquement
 	 *  'OG' = cotes de l'option groupée uniquement
-	 * 
+	 *
 	 * @param $cotesParPeriode
 	 * @param $type
 	 * @param $periode
@@ -877,15 +877,16 @@ class bullTQ {
 		$lesEchecs = array("I", "TI");
 		$init = array("nbCotes"=>0, "nbheures"=>0);
 
+		$tableauStat = array();
 		foreach ($cotesParPeriode as $periode=>$cotesDePeriode) {
 			// initialisation des données statistiques
 			$tableauStat[$periode] = array(
-				"E"=>$init, 	"TB"=>$init, 	"B"=>$init, 	"AB"=>$init, 
+				"E"=>$init, 	"TB"=>$init, 	"B"=>$init, 	"AB"=>$init,
 				"S"=>$init, 	"I"=>$init, 	"TI"=>$init
 				);
 			$tableauStat[$periode]['nbEchecs'] = 0;
 			$tableauStat[$periode]['nbheuresEchecs'] = 0;
-			
+
 			// on passe en revue toutes les cotes de la période
 			foreach ($cotesDePeriode as $coursGrp=>$unCours) {
 				$laCote = trim($unCours['global'], "*[]+- ");
@@ -906,7 +907,7 @@ class bullTQ {
 			}
 	return $tableauStat;
 	}
-	
+
 
 	/***
 	 * coupe un tableau en plusieurs sous-tableau en fonction des types passés dans un autre tabeleau, en deuxième argument
@@ -934,7 +935,7 @@ class bullTQ {
 			}
 		return $coursParTypes;
 		}
-		
+
 	/***
 	 * lecture des mentions de qualification (E1 -5e, E2 -5e, E3 -6e, E4 -6e, JURY -6e, TOTAL -6e) pour un élève donné
 	 * cotes provenant de la 5e et de la 6e
@@ -957,7 +958,7 @@ class bullTQ {
 		Application::DeconnexionPDO($connexion);
 		return $mentionsQualif;
 		}
-		
+
 	/***
 	 * renvoie les mentions manuelles provenant de la table des mentions pour l'élève dont on indique le matricule
 	 * les mentions manuelles sont fixées sur la base des résultats de l'élève dans les différents cours
@@ -986,25 +987,25 @@ class bullTQ {
 		$mentionsManuelles['stage']= self::coteStage($matricule, $periode); */
 		return $mentionsManuelles;
 	}
-	
-	
-	
+
+
+
 	/** PDF **********************************************************************
-	
-	
-	
-	
+
+
+
+
 	/***
 	 * création du fichier PDF de bulletin d'un élève
 	 * @param $acronyme : abréviation de l'utilisateur
 	 * @param $infoPerso : informations personnelles de l'élève
 	 * @param $bulletin : numéro de période du bulletin
-	 * @return void() : crée un fichier PDF 
+	 * @return void() : crée un fichier PDF
 	 */
 	public function createPDFeleve($acronyme, $infoPerso, $bulletin) {
 		$pdf=new PDF('P','mm','A4');
 		$pdf->SetFillColor (230);
-		
+
 		$this->createBulletinEleve($pdf, $infoPerso, $bulletin);
 
 		// création du répertoire correspondant à l'utilisateur en cours
@@ -1015,7 +1016,7 @@ class bullTQ {
 		$pdf->Output("pdf/$acronyme/$matricule.pdf");
 		chmod ("pdf/$acronyme/$matricule.pdf", 0644);
 		}
-		
+
 	/***
 	 * création du fichier PDF du bulletin d'une classe
 	 * @param $acronyme : identité de l'utilisateur
@@ -1032,12 +1033,12 @@ class bullTQ {
 		$pdf->SetFillColor (230);
 		$pdf->SetY(100);
 		$pdf->Cell(0, 72, $classe, 0,0, 'C');
-		
+
 		foreach ($listeEleves as $matricule => $infoPerso) {
 			$infoPerso['matricule'] = $matricule;
 			$this->createBulletinEleve($pdf, $infoPerso, $bulletin);
 			}
-		if (!(file_exists("pdf/$acronyme"))) 
+		if (!(file_exists("pdf/$acronyme")))
 			mkdir ("pdf/$acronyme");
 		$pdf->Output("pdf/$acronyme/$classe.pdf");
 	}
@@ -1060,7 +1061,7 @@ class bullTQ {
 		$pdf->SetTextColor(217,3,3);
 		$pdf->SetFont('Arial','BU');
 		}
-		
+
 	/***
 	 * insertion d'un pied de page incluant le numéro de page actuelle
 	 * @param $pdf : objet PDF
@@ -1072,8 +1073,8 @@ class bullTQ {
 	$pdf->SetFont('Arial','',8.5);
 	$pdf->Cell(0,5,"page $page ",0,'R',0);
 	}
-	
-	
+
+
 	/***
 	 * insertion d'un pied de page  finale incluant le numéro de page actuelle et le nombre total de pages
 	 * @param $pdf : objet PDF
@@ -1103,12 +1104,12 @@ class bullTQ {
 		$pdf->SetLeftMargin(6);
 		$x = 10;
 		$y = 12;
-	
+
 		$this->enteteBulletinPDF($pdf, $infoPerso, $titulaires, $bulletin);
 		$this->noir($pdf);
 		return $page+1;
-		}	
-	
+		}
+
 	/***
 	 * Création de l'entête du bulletin
 	 * @param $pdf : objet PDF créé dans la procédure appelante
@@ -1126,7 +1127,7 @@ class bullTQ {
 		$y = 12;
 		$pdf->SetLineWidth(0.2);
 		$pdf->Image("../images/logo1.jpg",12,8,25);
-	
+
 		$pdf->SetXY($x+30,$y-2);
 		$pdf->SetFont('Arial','B',14);
 		$pdf->MultiCell(120,5,$this->utf8(ECOLE),0,'L');
@@ -1136,17 +1137,17 @@ class bullTQ {
 		$pdf->SetXY($x+30,$y+14);
 		$pdf->SetFont('Arial','U',9);
 		$pdf->MultiCell(120,5,SITEWEB,0,'L');
-	
+
 		$pdf->SetFont('Arial','B',11);
 		$pdf->SetXY(90,$y-2);
 		$jour = date("d"); $mois = date("m"); $annee = date("Y");
-		
+
 		$titreEleve = sprintf($this->utf8("%s %s \n %s \n Titulaire(s): %s \n"),$eleve_prenom, $eleve_nom, $classe, $titulaires);
 		$titreEleve .= sprintf($this->utf8("Le %02d-%02d-%04d, période %d"), $jour,$mois,$annee,$bulletin);
 		$pdf->MultiCell(110,5, $titreEleve, 0,'R');
 		$pdf->Ln();
 	}
-	
+
 	private function brancheProfPDF ($pdf, $infoCours, $profs) {
 		$pdf->SetLineWidth(0.2);
 		$pdf->SetFont('Arial','B',8);
@@ -1162,7 +1163,7 @@ class bullTQ {
 		$pdf->Cell(8*24,5,$texte, 1,0,'L',true);
 		$pdf->Ln();
 		}
-	
+
 	/***
 	 * imprime les cotes globales (TJ, EX, Période, Global)
 	 * $pdf : l'objet PDF
@@ -1188,7 +1189,7 @@ class bullTQ {
 
 		return $pdf->GetY();
 		}
-		
+
 	/***
 	 * imprime la liste des cotes des cours généraux, avec les compétences
 	 * @param $pdf : l'objet PDF
@@ -1205,7 +1206,7 @@ class bullTQ {
 		$pdf->Cell(152, 5, $texte, 1, 0, 'C', true);
 		$pdf->Cell(20, 5, 'TJ', 1, 0, 'C', true);
 		$pdf->Cell(20, 5, 'EX', 1, 1, 'C', true);
-		
+
 		foreach ($cotes as $idComp=>$lesCotes) {
 			if (($lesCotes['Tj'] != '') || ($lesCotes['Ex'] != '')) {
 				$texteCompetence = $this->utf8($competences[$idComp]['libelle']);
@@ -1218,7 +1219,7 @@ class bullTQ {
 		}
 		$pdf->Ln();
 	}
-	
+
 	/***
 	 * impression du commentaire du prof pour le cours
 	 * @param $pdf: l'objet PDF
@@ -1231,19 +1232,19 @@ class bullTQ {
 		$pdf->SetFont('Arial','',9);
 		$texte = $this->utf8('Commentaire du professeur');
 		$pdf->Cell(60, 5, $texte, 0, 1, 'L', false);
-		
+
 		$pdf->SetFont('Arial','',7);
 		$commentaire = str_replace("…","...",$commentaire);
 		$commentaire = str_replace("’","'",$commentaire);
 		$commentaire = $this->utf8(html_entity_decode($commentaire));
-		
+
 		$y = $pdf->GetY();
 		$pdf->setXY($deplacement,$y);
 		$pdf->MultiCell(0,4,$commentaire, 1,'L',false);
-		
+
 		return $pdf->GetY();
 	}
-	
+
 	/***
 	 * impression de la remarque du titulaire
 	 * @param $pdf : objet PDF
@@ -1264,7 +1265,7 @@ class bullTQ {
 			$pdf->MultiCell(0,4,$remarque, 1,'L',false);
 		}
 	}
-	
+
 	/***
 	 * impression des mentions obtenues (en périodes de délibés)
 	 * @param $pdf : objet PDF
@@ -1277,14 +1278,14 @@ class bullTQ {
 		$pdf->Ln();
 		$texte = $this->utf8("Mentions globales");
 		$pdf->Cell(0, 5, $texte, 1, 1, 'C', true);
-		
+
 		$pdf->Cell(60, 5, "Pour l'option", 1, 0, 'R', true);
 		$pdf->Cell(0, 5, $mentions['option_final'], 1, 1, 'C', true);
 		$pdf->Cell(60, 5, "Pour l'ensemble de la formation", 1, 0, 'R', true);
 		$pdf->Cell(0, 5, $mentions['global_final'], 1, 1, 'C', true);
-		
+
 		}
-	
+
 	/***
 	 * écriture des signatures
 	 * @param
@@ -1305,14 +1306,14 @@ class bullTQ {
 		$pdf->MultiCell(40,5,$this->utf8('L\'élève'),0,'C');
 		$pdf->Ln();
 	}
-	
+
 	/***
 	 * crée effectivement le fichier PDF de bulletin d'un élève dans le répertoire de l'utilisateur
 	 * sous le nom correspondant au matricule de l'élève
 	 * @param $pdf : objet PDF créé dans la procédure appelante
 	 * @param $eleve : array détails de l'élève
 	 * @param $bulletin : numéro de période du bulletin
-	 * 
+	 *
 	 * @return void()
 	 */
 	private function createBulletinEleve ($pdf, $infoPerso, $bulletin) {
@@ -1332,20 +1333,20 @@ class bullTQ {
 			$mentions = $this->mentionsBulletin($matricule, $bulletin);
 			else $mentions = Null;
 		$remarqueTitu = $this->remarqueTitu($matricule, $bulletin);
-				
+
 		$pdf->AddPage('P');
 		$pdf->SetLeftMargin(6); // fixe la marge de gauche
 		$page=1;
 		$this->enteteBulletinPDF ($pdf, $infoPerso, $titulaires, $bulletin);
 		$pdf->SetFont('Arial','',8);
-		
+
 		foreach ($listeCoursGrp as $coursGrp=>$dataCours) {
 			$debutX = $pdf->GetX(); $debutY = $pdf->GetY();
 			$this->brancheProfPDF($pdf, $listeCoursGrp[$coursGrp], $listeProfs[$coursGrp]);
-			
+
 			// les deux prochaines zones doivent être imprimées à la même hauteur
 			$yBase = $pdf->GetY();
-			
+
 			// cotes globales
 			if (isset($listeCotesGlobales[$bulletin][$coursGrp][$matricule]))
 				$yGlobal = $this->cotesGlobalesPDF($pdf, $yBase, $listeCotesGlobales[$bulletin][$coursGrp][$matricule]);
@@ -1357,11 +1358,11 @@ class bullTQ {
 
 			// on descend au niveau le plus bas atteint par l'une des deux zones + 4mm
 			$pdf->SetY(max($yGlobal, $yCommentaire)+4);
-				
+
 			// cotes par compétences
 			$cours = $this->coursDeCoursGrp($coursGrp);
 			if (isset($listeCotesGeneraux[$bulletin][$matricule])) {
-				
+
 				if (isset($listeCotesGeneraux[$bulletin][$matricule][$coursGrp])) {
 					$cotes = $listeCotesGeneraux[$bulletin][$matricule][$coursGrp];
 					// vérifier que le teableau n'est pas vide malgré tout (aucune cote présente)
@@ -1379,7 +1380,7 @@ class bullTQ {
 					else $competences = Null;
 				if ($cotes && $competences)
 					$this->cotesGenerauxPDF($pdf, $competences, $cotes);
-				} 
+				}
 
 			// ligne horizontale
 			$pdf->SetLineWidth(0.5);
@@ -1391,23 +1392,308 @@ class bullTQ {
 				$page = $this->newPage ($pdf, $infoPerso, $titulaires, $bulletin, $page);
 				else $pdf->Ln(1);
 			}
-		
+
 		// remarque du titulaire
-		if (isset($remarqueTitu[$bulletin][$matricule])) 
+		if (isset($remarqueTitu[$bulletin][$matricule]))
 			$this->tituPDF($pdf, $remarqueTitu[$bulletin][$matricule]);
-			
+
 		// mentions de situation (aux périodes de délibés)
 		if (isset($mentions[$matricule]))
 			$this->mentionsPDF($pdf, $mentions[$matricule]);
-		
+
 		// signature du bulletin
 		$this->signatures($pdf);
-		
+
 		$this->piedPageFinal($pdf, $page);
 		}
 
+	/**
+	 * Initialisation de la table passée en paramètre
+	 * @param $table string
+	 * @return nombre d'actions réussies sur la BD
+	 */
+	public function init ($table) {
+		$connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
+		$sql = "DELETE FROM ".PFX."bullTQ".$table." WHERE 1 > 0 ";
+		$resultat = $connexion->exec($sql);
+		Application::deconnexionPDO($connexion);
+		return 1;
+		}
+
+   /**
+     * enregistrement des compétences provenant du formulaire "adminCompetences.tpl"
+     * @param $post
+     * @return integer : nombre de modifications dans la BD
+     */
+    function enregistrerCompetences($post) {
+        $cours = $post['cours'];
+        $resultat = 0;
+        // mise en ordre des données reçues
+        $dataExiste = array();  $dataNew=array();
+        foreach ($post as $field=>$value) {
+            $champ = explode("_", $field);
+            // mises à jour et suppression des compétences
+            if ($champ[0] == "libelle") {
+                $idComp = $champ[1];    $dataExiste[$idComp]['libelle'] = addslashes($value);
+            }
+            if ($champ[0] == "ordre") {
+                $idComp = $champ[1];    $dataExiste[$idComp]['ordre'] = addslashes($value);
+            }
+
+            // nouvelles compétences
+            if ($field == 'newComp')
+                $dataNew = $value;
+            }
+        $connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
+        foreach ($dataExiste as $idComp=>$data) {
+            if ($data['libelle'] == "") {
+                $sql = "DELETE FROM ".PFX."bullTQCompetences ";
+                $sql .= "WHERE id='$idComp'";
+                $resultat += $connexion->exec($sql);
+                }
+                else {
+                    $ordre = $data['ordre'];
+                    $libelle = $data['libelle'];
+                    $sql = "UPDATE ".PFX."bullTQCompetences ";
+                    $sql .= "SET ordre='$ordre', libelle='$libelle' ";
+                    $sql .= "WHERE id = '$idComp'";
+                    $resultat += $connexion->exec($sql);
+                    }
+            }
+        foreach ($dataNew as $libelle) {
+            $libelle = addslashes($libelle);
+            if ($libelle != '') {
+                $sql = "INSERT INTO ".PFX."bullTQCompetences ";
+                $sql .= "SET libelle='$libelle', cours='$cours'";
+                $resultat += $connexion->exec($sql);
+                }
+        }
+        Application::DeconnexionPDO($connexion);
+        return $resultat;
+    }
 
 
-}      
+	/***
+	 * retourne la liste des cours pour la liste de niveaux donnée
+	 * @param $listeNiveaux
+	 * @return array
+	 */
+	public function listeCoursNiveaux ($listeNiveaux) {
+	 	if (is_array($listeNiveaux))
+			$listeNiveauxString = implode(',',$listeNiveaux);
+			else $listeNiveauxString = $listeNiveaux;
+		$connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
+		$sql = "SELECT cours, libelle, nbheures, section, statut ";
+		$sql .= "FROM ".PFX."cours ";
+		$sql .= "JOIN ".PFX."statutCours ON (".PFX."statutCours.cadre = ".PFX."cours.cadre) ";
+		$sql .= "WHERE SUBSTR(cours, 1,1) IN ($listeNiveauxString) AND section='TQ' ";
+        $sql .= "ORDER BY libelle";
+		$listeCours = array();
+		$resultat = $connexion->query($sql);
+		if ($resultat) {
+			$resultat -> setFetchMode(PDO::FETCH_ASSOC);
+			while ($ligne = $resultat->fetch()) {
+				$cours = $ligne['cours'];
+				$listeCours[$cours] = $ligne;
+				}
+			}
+        Application::DeconnexionPDO($connexion);
+        return $listeCours;
+	 }
+
+	/**
+	 * retourne les types définis (option ou formation générale) pour les cours dont on fournit la liste
+	 * @param array $listeCours
+	 * @return array liste des types associés aux cours
+	 */
+	public function listeTypes($listeCours) {
+		if (is_array($listeCours))
+			$listeCoursString = "'" . implode("','", array_keys($listeCours)) . "'";
+			else $listeCoursString = "'".$liseCours."'";
+		$connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
+		$sql = "SELECT libelle, coursGrp, type ";
+		$sql .= "FROM ".PFX."bullTQtypologie AS tp ";
+		$sql .= "JOIN ".PFX."cours AS dc ON dc.cours = tp.coursGrp ";
+		$sql .= "WHERE coursGrp IN ($listeCoursString) ";
+		$resultat = $connexion->query($sql);
+		if ($resultat) {
+			$resultat -> setFetchMode(PDO::FETCH_ASSOC);
+			while ($ligne = $resultat->fetch()) {
+				$cours = $ligne['coursGrp'];
+				$listeCours[$cours]['type']=$ligne['type'];
+				}
+			}
+        Application::DeconnexionPDO($connexion);
+        return $listeCours;
+		}
+
+	/**
+	 * enregistre les associations cours / type (option ou général) provenant du formulaire ad-hoc
+	 * @param $post array : provenant du formulaire
+	 * @return integer : nombre de modifications dans la BD
+	 */
+	public function enregistrerTypes($post) {
+		$connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
+		$nbResultats = 0;
+		foreach ($post as $champ=>$value) {
+			if (substr($champ,0,6) == 'field_') {
+				$champ = explode('_',$champ);
+				$champ = str_replace('~',' ',$champ[1]);
+				$sql = "INSERT INTO ".PFX."bullTQtypologie ";
+				$sql .= "SET coursGrp='$champ', type='$value' ";
+				$sql .= "ON DUPLICATE KEY UPDATE type='$value' ";
+				$nbResultats += $connexion->exec($sql);
+				}
+			}
+        Application::DeconnexionPDO($connexion);
+        return $nbResultats;
+		}
+
+	/**
+	 * enregistrement de la décision du Conseil de Classe provenant de la feuille de délibé individuelle
+	 * @param $post
+	 * @return integer : normalement, 1
+	 */
+	public function enregistrerDecision($post) {
+		$matricule = $post['matricule'];
+		$decision = $post['decision'];
+		if ($decision == 'Restriction')
+			$restriction = $post['restriction'];
+			else $restriction = '';
+		$mail = isset($post['mail']) && ($post['mail'] == true)?1:0;
+		$notification = isset($post['notification']) && ($post['notification'] == true)?1:0;
+		$mailEleve = $post['mailEleve'];
+		$adresseMail = ($post['adresseMail']!= $mailEleve)?$post['adresseMail']:'';
+		$connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
+		$sql = "INSERT INTO ".PFX."bullDecisions ";
+		$sql .= "SET matricule='$matricule', decision='$decision', restriction='$restriction', mail='$mail', notification='$notification', ";
+		$sql .= "adresseMail='$adresseMail' ";
+		$sql .= "ON DUPLICATE KEY UPDATE ";
+		$sql .= "decision='$decision', restriction='$restriction', mail='$mail', notification='$notification', ";
+		$sql .= "adresseMail='$adresseMail' ";
+
+		$resultat = $connexion->exec($sql);
+		Application::DeconnexionPDO($connexion);
+		return $resultat;
+		}
+
+	/**
+	 * renvoie les décisions de délibération pour la liste d'élèves indiqués
+	 * @param $matricule / liste de matricules
+	 * @return array
+	 */
+	public function listeDecisions ($listeEleves){
+		if (is_array($listeEleves))
+			$listeElevesString = implode(",", array_keys($listeEleves));
+		else
+			$listeElevesString = $listeEleves;
+		$connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
+		$sql = "SELECT dp.matricule, user, mailDomain, decision, restriction, notification, mail, adresseMail, DATE_FORMAT(quand, '%d/%m %H:%i') AS quand, ";
+		$sql .= "CONCAT(nom,' ',prenom) AS nom, groupe ";
+		$sql .= "FROM ".PFX."passwd AS dp ";
+		$sql .= "LEFT JOIN ".PFX."bullDecisions AS dbd ON dbd.matricule = dp.matricule ";
+		$sql .= "JOIN ".PFX."eleves AS de ON de.matricule = dp.matricule ";
+		$sql .= "WHERE dp.matricule IN ($listeElevesString) ";
+		$resultat = $connexion->query($sql);
+		$listeDecisions = array();
+		if ($resultat) {
+			$resultat -> setFetchMode(PDO::FETCH_ASSOC);
+			while ($ligne = $resultat->fetch()) {
+				$matricule = $ligne['matricule'];
+				if (($ligne['decision'] == '') || ($ligne['quand'] != ''))
+					$ligne['okEnvoi'] = false;
+					else $ligne['okEnvoi'] = true;
+				if ($ligne['adresseMail'] == '') {
+					$ligne['adresseMail'] = $ligne['user'].'@'.$ligne['mailDomain'];
+				}
+				$listeDecisions[$matricule] = $ligne;
+			}
+		}
+		Application::DeconnexionPDO($connexion);
+		return $listeDecisions;
+	}
+
+	/**
+	 * établir la liste de synthèse des décisions prises pour les élèves dont la liste est fournie
+	 * @param $listeEleves
+	 * @result array
+	 */
+	public function listeSynthDecisions($listeEleves) {
+		if (is_array($listeEleves))
+			$listeElevesString = implode(",", array_keys($listeEleves));
+		else
+			$listeElevesString = $listeEleves;
+		$connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
+		$sql = "SELECT bd.matricule, decision, restriction, mail, notification, adresseMail, quand, ";
+		$sql .= "nom, prenom, user, mailDomain ";
+		$sql .= "FROM ".PFX."bullDecisions AS bd ";
+		$sql .= "JOIN ".PFX."eleves AS de ON de.matricule = bd.matricule ";
+		$sql .= "JOIN ".PFX."passwd AS dpw ON dpw.matricule = bd.matricule ";
+		$sql .= "WHERE bd.matricule IN ($listeElevesString) ";
+		$sql .= "ORDER BY REPLACE(REPLACE(REPLACE(nom,' ',''),'-',''),'\'',''), prenom ";
+
+		$resultat = $connexion->query($sql);
+		$liste = array();
+		if ($resultat) {
+			$resultat -> setFetchMode(PDO::FETCH_ASSOC);
+			while ($ligne = $resultat->fetch()) {
+				$matricule = $ligne['matricule'];
+				$photo = Ecole::photo($matricule);
+				$ligne['photo']=$photo;
+				$liste[$matricule] = $ligne;
+			}
+		}
+		Application::DeconnexionPDO($connexion);
+		return $liste;
+	}
+
+	/**
+	 * dater (et donc clôturer) les décisions de C.Cl pour les élèves dont la liste est fournie en paramètre
+	 * @param array $listeEleves
+	 * @return $nb : integer
+	 */
+	public function daterDecisions($listeEleves) {
+		$connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
+		$nb = 0;
+		foreach ($listeEleves as $matricule) {
+			$sql = "UPDATE ".PFX."bullDecisions ";
+			$sql .= "SET quand=NOW() ";
+			$sql .= "WHERE matricule = '$matricule' ";
+			$resultat = $connexion->exec($sql);
+			$nb++;
+			}
+		Application::DeconnexionPDO($connexion);
+		return $nb;
+		}
+
+
+	/**
+	 * recherche des mentions globales finales obtenues par la liste des élèves passée en argument
+	 * @param $listeEleves
+	 * @return array: liste des mentions par élève et par période de délibé
+	 */
+	public function mentionsGlobalesFinales($listeEleves) {
+		if (is_array($listeEleves))
+			$listeElevesString = implode(",", array_keys($listeEleves));
+		else
+			$listeElevesString = $listeEleves;
+		$connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
+		$sql = "SELECT matricule, periode, mention ";
+		$sql .= "FROM ".PFX."bullTQMentions ";
+		$sql .= "WHERE matricule IN ($listeElevesString) AND type='global_final' ";
+		$resultat = $connexion->query($sql);
+		$liste = array();
+		if ($resultat) {
+			while ($ligne = $resultat->fetch()) {
+				$matricule = $ligne['matricule'];
+				$periode = $ligne['periode'];
+				$liste[$matricule][$periode] = $ligne['mention'];
+			}
+		}
+		Application::DeconnexionPDO($connexion);
+		return $liste;
+		}
+
+}
 
 ?>

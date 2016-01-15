@@ -1,32 +1,35 @@
 <?php 
+require_once('config.inc.php');
+
+// définition de la class USER utilisée en variable de SESSION
+require_once (INSTALL_DIR."/inc/classes/classUser.inc.php");
+
+// définition de la class Application
+require_once (INSTALL_DIR."/inc/classes/classApplication.inc.php");
+$Application = new Application();
+
 session_start();
+if (isset($_SESSION[APPLICATION])) {
+
+	$user = $_SESSION[APPLICATION];
+
+	// suppression de la notification en BD
+	$user->delogger();
+	}
 session_destroy();
+header('Location: ./accueil.php?message=logout');
 ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+
+<!DOCTYPE html>
 <html>
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-  <title>Déconnexion</title>
-  <link media="all" rel="stylesheet" href="screen.css" type="text/css">
-<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js"></script>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<title>Déconnexion</title>
+	<link type="text/css" rel="stylesheet" media="all" href="screen.css">
+	<link type="text/css" rel="stylesheet" media="screen" href="js/blockUI.css">	
+	<script type="text/javascript" src="js/jquery-1.10.2.min.js"></script>
+	<script type="text/javascript" src="js/jquery.blockUI.js"></script>
 
-<script type="text/javascript" src="js/jquery.blockUI.js"></script>
-<link type="text/css" media="screen" rel="stylesheet" href="js/blockUI.css">
-
-<script type="text/javascript">
-  
-  function delayRedirect(){  
-	window.location = "index.php";  
-  } 
-$(document).ready(function(){
-	setTimeout('delayRedirect()', 1000);
-	$.growlUI(
-				$(".attention .title").html(),
-				$(".attention .texte").html(),
-				2000
-			)
-	})
-</script>
 </head>
 <body>
 <img src="images/bigwait.gif" id="wait" alt="wait">
@@ -34,5 +37,6 @@ $(document).ready(function(){
     <span class="title">Confirmation</span>
     <span class="texte">Déconnexion en cours</span>
 </div>
+
 </body>
 </html>

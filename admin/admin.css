@@ -1,7 +1,3 @@
-.table {
-    text-align:center;
-    background-color:  #FED5D4
-}
 
 .inactif {
     background-color:#F6CDC2;
@@ -13,3 +9,30 @@
   font-size: 14pt;
   font-family:'Courier New', Courier, monospace
 }
+
+.tableauBull {
+	width: 100%;
+	font-size:10pt;
+}
+
+.tableauBull td {
+  border: 1px solid #dddddd;
+  font-size: 0.9em;
+}
+.tableauBull th {
+  border: 1px outset black;
+  padding: 0;
+  background-color: #dddddd;
+  font-weight: normal;
+  font-size: 0.9em;
+}
+.tableauBull .bilan {
+  background-color: #ccccee;
+}
+.tableauBull .bilan .echecs {
+  color: red;
+}
+.tableauBull .bilan .echecs {
+  text-align: left;
+}
+

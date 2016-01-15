@@ -1,4 +1,5 @@
 <?php
+
 require_once("../config.inc.php");
 include (INSTALL_DIR."/inc/entetes.inc.php");
 
@@ -11,14 +12,15 @@ $smarty->assign('mode',$mode);
 require_once("inc/classes/classBulletin.inc.php");
 $Bulletin = new Bulletin();
 
-$smarty->assign("listeCours",$user->listeCoursProf("'G','S','TT'"));
+$smarty->assign('listeCours',$user->listeCoursProf(SECTIONS));
+$smarty->assign('sections',SECTIONS);
 $acronyme = $user->getAcronyme();
 
 $etape = isset($_REQUEST['etape'])?$_REQUEST['etape']:Null;
 $smarty->assign('etape',$etape);
 
-$smarty->assign("corpsPage",Null);
-$smarty->assign("selecteur",Null);
+$smarty->assign('corpsPage',Null);
+$smarty->assign('selecteur',Null);
 
 switch ($action) {
 	case 'init':
@@ -28,6 +30,7 @@ switch ($action) {
 		include ("inc/gestEcran.php");
 		break;
 	case 'gestionCotes':
+		// aperçu des cotes pour un cours
 		include ("inc/gestCotes.php");
 		break;
 	case 'pdf':
@@ -50,6 +53,10 @@ switch ($action) {
 	case 'gestEncodageBulletins':
 		// encodage des bulletins par les profs des différentes branches
 		include("inc/gestEncodageBulletins.php");
+		break;
+	case 'gestEprExternes':
+		// encodage des points des épreuves externes
+		include("inc/gestEprExternes.php");
 		break;
 	case 'gestSituations':
 		include("inc/gestSituations.php");
@@ -80,6 +87,6 @@ switch ($action) {
 		include ("inc/news.php");
 		break;
 	}
-$smarty->assign("executionTime",round($Application->chrono()-$debut,6));
+$smarty->assign("executionTime", round($chrono->stop(),6));
 $smarty->display("index.tpl");
 ?>

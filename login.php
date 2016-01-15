@@ -7,7 +7,7 @@ require_once (INSTALL_DIR."/inc/classes/classApplication.inc.php");
 $Application = new Application();
 $Application->Normalisation();
 
-// définition de la class USER 
+// définition de la class USER
 require_once (INSTALL_DIR."/inc/classes/classUser.inc.php");
 
 // extraire l'identifiant et le mot de passe
@@ -18,27 +18,24 @@ $mdp = (isset($_POST['mdp']))?$_POST['mdp']:Null;
 if (!empty($acronyme) && !empty($mdp)) {
 	// recherche de toutes les informations sur l'utilisateur et les applications activées
 	$user = new user($acronyme);
-
 	// noter le passage de l'utilisateur dans les logs
 	$user->logger($acronyme);
 	$identification = $user->identification();
-	if (!$Application->bannedIP($identification['ip'])) {
-		// vérification du mot de passe
-		if ($user->getPasswd() == md5($mdp)) {
-			// mettre à jour la session avec les infos de l'utilisateur
-			$_SESSION[APPLICATION] = $user;
-			header("Location: index.php");
+
+	// vérification du mot de passe
+	if ($user->getPasswd() == md5($mdp)) {
+		// mettre à jour la session avec les infos de l'utilisateur
+		$_SESSION[APPLICATION] = $user;
+		header("Location: index.php");
+		}
+		else {
+			$data['mdp']= $mdp;
+			if ($Application->mailAlerte($acronyme, $user,'mdp', $data))
+				header("Location: accueil.php?message=erreurMDP");
+				else header("Location: accueil.php?message=erreurMDP");
 			}
-			else {
-				$data['mdp']= $mdp;
-				if ($Application->mailAlerte($user,'mdp', $data))
-					header("Location: accueil.php?erreur=faux");
-					else header("Location: accueil.php?erreur=faux&noMail=true");
-				}
-			}
-			else die("banni");
 	}
 	else
 	// le nom d'utilisateur ou le mot de passe n'ont pas été donnés
 	header("Location: accueil.php?erreur=manque");
-?>    
+?>

@@ -13,7 +13,7 @@
 			{if isset($listeEleves)}
 				{* key = matric car $matricule est passé en argument *}
 				{foreach from=$listeEleves key=matric item=eleve}
-				<option value="{$matric}"{if isset($matricule) && ($matric == $matricule)} selected{/if}>
+				<option value="{$matric}"{if isset($matricule) && ($matric == $matricule)} selected="selected"{/if}>
 					{$eleve.nom} {$eleve.prenom}</option>
 				{/foreach}
 			{/if}
@@ -27,7 +27,7 @@
 </div>
 
 <script type="text/javascript">
-{literal}
+
 $(document).ready (function() {
 
 	$("#formSelecteur").submit(function(){
@@ -42,16 +42,17 @@ $(document).ready (function() {
 		if (classe != '') $("#envoi").show();
 		// la fonction listeEleves.inc.php renvoie la liste déroulante
 		// des élèves de la classe sélectionnée
-		$.post("inc/listeEleves.inc.php",
-			{'classe': classe,
-			 'partis': true},
+		$.post('inc/listeEleves.inc.php', {
+			'classe': classe,
+			'partis': true
+			},
 				function (resultat){
 					$("#choixEleve").html(resultat)
 				}
 			)
 	});
 
-	$("#selectEleve").live("change", function(){
+	$("#selectEleve").change(function(){
 		if ($(this).val() > 0) {
 			// si la liste de sélection des élèves renvoie une valeur significative
 			// le formulaire est soumis
@@ -61,5 +62,5 @@ $(document).ready (function() {
 			else $("#envoi").hide();
 		})
 })
-{/literal}
+
 </script>

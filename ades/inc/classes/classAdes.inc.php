@@ -97,7 +97,11 @@ class Ades {
 		return $liste;
 	}
 
-
+	/**
+	 * Lecture de la description des champs dans la BD
+	 * @param
+	 * @return array
+	 */
 	private function lireDescriptionChamps(){
 		$connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
 		$sql = "SELECT * FROM ".PFX."adesChamps ";
@@ -201,17 +205,12 @@ class Ades {
 	 */
 	public function listeRetenues ($typeRetenue, $affiche=true) {
 		$connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
-		$sql = "SELECT 	type, idretenue, dateRetenue, heure, duree, local, places, affiche, ";
-		$sql .= "(SELECT COUNT(*) ";
-		$sql .= "FROM ".PFX."adesFaits ";
-		$sql .= "WHERE ".PFX."adesFaits.idretenue = ".PFX."adesRetenues.idretenue) as occupation ";
+		$sql = "SELECT type, idretenue, dateRetenue, heure, duree, local, places, affiche ";
 		$sql .= "FROM ".PFX."adesRetenues ";
 		$sql .= "WHERE type='$typeRetenue' ";
 		if ($affiche == true)
-			$sql .= "AND affiche = true ";
-		$sql .= "AND dateRetenue > '".BEGINDATE."' ";
+			$sql .= "AND affiche = 'O' ";
 		$sql .= "ORDER BY dateRetenue, heure ";
-
 		$resultat = $connexion->query($sql);
 		$liste = array();
 		if ($resultat) {
@@ -220,7 +219,23 @@ class Ades {
 				$idretenue = $ligne['idretenue'];
 				$ligne['jourSemaine'] = Application::jourSemaineMySQL($ligne['dateRetenue']);
 				$ligne['dateRetenue'] = Application::datePHP($ligne['dateRetenue']);
+				$ligne['occupation'] = 0;
 				$liste[$idretenue] = $ligne;
+				}
+			}
+		$listeIdRetenue = implode(',',array_keys($liste));
+
+		$sql = "SELECT idretenue, COUNT(*) as occupation ";
+		$sql .= "FROM ".PFX."adesFaits ";
+		$sql .= "WHERE idretenue IN ($listeIdRetenue) ";
+		$sql .= "GROUP BY idretenue ";
+		$resultat = $connexion->query($sql);
+		if ($resultat) {
+			$resultat->setFetchMode(PDO::FETCH_ASSOC);
+			$listeOccupation = $resultat->fetchall();
+			foreach ($listeOccupation as $wtf=>$data) {
+				$idretenue = $data['idretenue'];
+				$liste[$idretenue]['occupation']=$data['occupation'];
 				}
 			}
 		Application::DeconnexionPDO($connexion);
@@ -260,7 +275,6 @@ class Ades {
 		$sql = "INSERT INTO ".PFX."adesTextes ";
 		$sql .= "SET idTexte = '$idTexte', user='$user', free='$free', texte='$texte', champ='$champ' ";
 		$sql .= "ON DUPLICATE KEY UPDATE user='$user', free='$free', texte='$texte', champ='$champ' ";
-
 		$resultat = $connexion->exec($sql);
 		Application::DeconnexionPDO($connexion);
 		return $resultat;
@@ -276,7 +290,7 @@ class Ades {
 		$sql = "DELETE FROM ".PFX."adesTextes ";
 		$sql .= "WHERE idTexte='$id' ";
 		$resultat = $connexion->exec($sql);
-		Application::DeconnexionPOD($connexion);
+		Application::DeconnexionPDO($connexion);
 		return $resultat;
 	}
 
@@ -317,7 +331,7 @@ class Ades {
 		$sql .= "FROM ".PFX."adesFaits ";
 		$sql .= "JOIN ".PFX."eleves ON (".PFX."eleves.matricule = ".PFX."adesFaits.matricule) ";
 		$sql .= "WHERE idretenue = '$idretenue' ";
-		$sql .= "ORDER BY groupe ";
+		$sql .= "ORDER BY nom, prenom, groupe ";
 		$resultat = $connexion->query($sql);
 		$liste = array();
 		if ($resultat) {
@@ -400,9 +414,9 @@ class Ades {
 		return $infos;
 	}
 
-function utf8($argument) {
-	return utf8_decode($argument);
-	}
+	function utf8($argument) {
+		return utf8_decode($argument);
+		}
 
 	/**
 	 * Impression d'un billet de retenue
@@ -479,7 +493,7 @@ function utf8($argument) {
 		$pdf->Output("pdf/$acronyme/".$data['eleve']['matricule'].".pdf",'D');
 	}
 
-	/***
+	/**
 	 * renvoie la liste des champs qui doivent apparaître dans un "contexte" donné pour chaque élément d'un fait disciplinaire
 	 * @param $contexte : string
 	 * @return array
@@ -517,7 +531,7 @@ function utf8($argument) {
 		return $listeFaits;
 	}
 
-	/***
+	/**
 	 * renvoie une table de correspondance entre les noms et les titres des champs à exposer
 	 * @param
 	 * @return array
@@ -586,7 +600,7 @@ function utf8($argument) {
 		$fin = Application::dateMysql($fin);
 		$connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
 		$sql = "SELECT af.idFait, af.type, af.*, titreFait, ae.groupe AS classe, ";
-		$sql .= "dateRetenue, heure, duree, ap.nom, ap.prenom, ap.sexe ";
+		$sql .= "dateRetenue, local, heure, duree, ap.nom, ap.prenom, ap.sexe ";
 		$sql .= "FROM ".PFX."adesFaits AS af ";
 		$sql .= "JOIN ".PFX."eleves AS ae ON (ae.matricule = af.matricule ) ";
 		$sql .= "JOIN ".PFX."adesTypesFaits AS atf ON (atf.type = af.type) ";
@@ -619,7 +633,7 @@ function utf8($argument) {
 		return $listeFiches;
 	}
 
-	/***
+	/**
 	 * inverse le mode d'affichage des retenues dans leur liste; une retenue affichée devient cachée et inversement
 	 * renvoie un string indiquant le mode d'affichage ("O" ou "N")
 	 * @param $idRetenue

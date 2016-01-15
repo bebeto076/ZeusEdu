@@ -1,8 +1,20 @@
+<div class="container">
+	
+{if (isset($message))}
+<div class="alert alert-{$message.urgence} alert-dismissable">
+	<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+	<h4>{$message.title}</h4>
+	<p>{$message.texte}</p>
+</div>
+{/if}
+	
 <h3>Liste des verrous à modifier en période {$bulletin} au niveau {$niveau}</h3>
 <form name="formVerrouiller" id="formVerrouiller" action="index.php" method="POST">
 {if $listeVerrous|@count == 0}
 	Rien à modifier
 	{else}
+	<div style="width:40%; float:right" class="inv" id="notice">Attention! Cette fonctionnalité peut demander plusieurs passages si le nombre de verrous à modifier est trop grand</div>
+	
 	<input type="hidden" name="action" value="{$action}">
 	<input type="hidden" name="mode" value="{$mode}">
 	<input type="hidden" name="etape" value="enregistrer">
@@ -41,8 +53,10 @@
 {/if}
 </form>
 
+</div>  <!-- container -->
+
 <script type="text/javascript">
-{literal}
+
 $(document).ready(function(){
 	$(".collapsible").click(function(){
 		$(this).parent().children().filter("ul").toggle("slow")
@@ -62,5 +76,5 @@ $(document).ready(function(){
 		$.blockUI();
 		})
 	})
-{/literal}
+
 </script>

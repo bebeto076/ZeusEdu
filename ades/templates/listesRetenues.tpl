@@ -1,45 +1,75 @@
-<h3>Dates et modification des dates de retenues</h3>
-<h4>Type: {$infosRetenue.titreFait} Nombre: {$listeRetenues|@count}</h4>
-<form name="editRetenues" id="editRetenues" method="POST" action="index.php">
-	<span class="fauxBouton" id="cache">Cacher/Montrer</span>
-<table class="tableauAdmin" id="tableRetenues">
-	<tr>
-	<th>&nbsp;</th>
-	<th>Date</th>
-	<th>Heure</th>
-	<th>Durée</th>
-	<th>Local</th>
-	<th>Places</th>
-	<th>Occupation</th>
-	<th>Visible</th>
-	<th style="display:none">&nbsp;</th>
-	<th>&nbsp;</th>
-	<th>&nbsp;</th>
-
-	</tr>
-	{foreach from=$listeRetenues key=id item=uneRetenue}
-	<tr id="{$id}" class="{if $uneRetenue.occupation < $uneRetenue.places}libre {else}rempli {/if}{if $uneRetenue.affiche == 'N'}cache{/if}">
-		<td class="del"><a href="javascript:void(0)">{if $uneRetenue.occupation == 0}<img src="images/suppr.png" alt="x">{/if}&nbsp;</a></td>
-		<td class="date">{$uneRetenue.dateRetenue}</td>
-		<td class="heure">{$uneRetenue.heure}</td>
-		<td class="duree">{$uneRetenue.duree}h</td>
-		<td class="local">{$uneRetenue.local}</td>
-		<td class="places">{$uneRetenue.places}</td>
-		<td class="occupation">{$uneRetenue.occupation}</td>
-		<td style="text-align:center; cursor:pointer" id="vis_{$uneRetenue.idretenue}" class="visible" title="cliquer pour changer l'état">
-			<a href="javascript:void(0)"><strong>{if $uneRetenue.affiche == 'O'}O{else}N{/if}</strong></a></td>
-		<td class="typeRetenue" style="display:none">{$infosRetenue.typeRetenue}</td>
-		<td title="Modifier"><a href="index.php?action=retenues&amp;mode=edit&amp;idretenue={$uneRetenue.idretenue}"><img src="images/editer.png" alt="O"></a></td>
-		<td title="Cloner" class="cloner"><a href="javascript:void(0)"><img src="images/clone.png" alt="Clone"></a></td>
-	</tr>
+<div class="container">
 	
-	{/foreach}
-</table>
+<h3>Dates et modification des dates de retenues</h3>
 
+<a class="btn btn-primary pull-right btn-lg" role="button" href="index.php?action=retenues&amp;mode=edit&amp;typeRetenue={$typeRetenue}">Nouvelle retenue</a>
+
+<h4>Type: {$infosRetenue.titreFait} Nombre: <span id="nbRetenues">{$listeRetenues|@count}</span></h4>
+
+<form name="editRetenues" id="editRetenues" method="POST" action="index.php" class="form-vertical" role="form">
+	
+	<button type="button" class="btn btn-primary" id="cache" title="Montrer les retenues cachées">Cacher/Montrer</button>
+
+	<div class="table-responsive">
+		
+		<table class="table table-condensed table-hover" id="tableRetenues">
+			<thead>
+				<tr>
+				<th>&nbsp;</th>
+				<th>Date</th>
+				<th>Heure</th>
+				<th>Durée</th>
+				<th>Local</th>
+				<th>Places</th>
+				<th>Occupation</th>
+				<th>Visible</th>
+				<th>Éditer</th>
+				<th>Cloner</th>
+				</tr>
+			</thead>
+			{foreach from=$listeRetenues key=id item=uneRetenue}
+			<tr id="{$id}" class="{if $uneRetenue.occupation < $uneRetenue.places}libre {else}rempli {/if}{if $uneRetenue.affiche == 'N'}cache{/if}">
+				<td class="del"><a href="javascript:void(0)">{if $uneRetenue.occupation == 0}<span class="glyphicon glyphicon-remove-circle" style="color:red"></span>{else}&nbsp;{/if}</a></td>
+				<td>{$uneRetenue.jourSemaine|truncate:3:''} <span class="date">{$uneRetenue.dateRetenue}</span></td>
+				<td class="heure">{$uneRetenue.heure}</td>
+				<td class="duree">{$uneRetenue.duree}h</td>
+				<td class="local">{$uneRetenue.local}</td>
+				<td class="places">{$uneRetenue.places}</td>
+				<td class="occupation">{$uneRetenue.occupation}</td>
+				
+				<td style="text-align:center; cursor:pointer" id="vis_{$uneRetenue.idretenue}" class="visible" title="cliquer pour changer l'état" data-container="body" data-toggle="tooltip" data-html="true" data-placement="bottom">
+					{if $uneRetenue.affiche == 'O'}
+					<span class="glyphicon glyphicon-eye-open vis"></span>
+						{else}
+					<span class="glyphicon glyphicon-eye-close invis"></span>
+					{/if}
+				</td>
+				
+				<td style="text-align:center" title="Modifier" data-container="body" data-toggle="tooltip" data-html="true" data-placement="bottom">
+					<a href="index.php?action=retenues&amp;mode=edit&amp;idretenue={$uneRetenue.idretenue}">
+					<span class="glyphicon glyphicon-edit"></span>	
+					</a>
+				</td>
+				
+				<td style="text-align:center" title="Cloner" class="cloner" data-container="body" data-toggle="tooltip" data-html="true" data-placement="bottom">
+					<a href="javascript:void(0)">
+						<span class="glyphicon glyphicon glyphicon-user" style="font-size:1.2em; color: #0083FF"></span>
+						<span class="glyphicon glyphicon glyphicon-user" style="font-size:0.8em; color: #FF0083"></span>
+					</a>
+				</td>
+			</tr>
+			{/foreach}
+		</table>
+
+</div>
+
+<input type="hidden" name="typeRetenue" value="{$infosRetenue.typeRetenue}" id="typeRetenue">
 </form>
 
+</div>  <!-- container -->
+
 <script type="text/javascript">
-	{literal}
+
 	$(document).ready(function(){
 		$(".cache").hide();
 		
@@ -50,14 +80,19 @@
 		$("#tableRetenues").on("click", ".visible", function(){
 			var visible = $(this);
 			var id=$(this).attr('id');
-			var texte = $(this).find('strong').text();
-			$.post('inc/visibleInvisible.inc.php',
-			   {'id': id,
-			   'texte': texte},
+			var texte = $(this).find('.vis')?'O':'N';
+			$.post('inc/visibleInvisible.inc.php', {
+				'id': id,
+				'texte': texte
+			   },
 			   function (resultat) {
-				visible.find('strong').text(resultat);
-				if (resultat == 'N')
+				if (resultat == 'N') {
+					visible.find('.glyphicon').removeClass().addClass('glyphicon glyphicon-eye-close invis');
 					visible.parents('tr').fadeOut();
+					}
+					else {
+						visible.find('.glyphicon').removeClass().addClass('glyphicon glyphicon-eye-open vis');
+					}
 			   }
 			)
 			})
@@ -66,18 +101,16 @@
 		$("#tableRetenues").on("click", ".cloner", function(){
 			var moi = $(this);
 			var ligne = $(this).parent().clone(true);
-
 			var id = ligne.attr("id");
 			var date = ligne.find(".date").text();
 			var heure = ligne.find(".heure").text();
 			var duree = ligne.find(".duree").text();
 			var local = ligne.find(".local").text();
 			var places = ligne.find(".places").text();
-			var typeRetenue = ligne.find(".typeRetenue").text();
+			var typeRetenue = $("#typeRetenue").val();
 
 			$.post(
-				'inc/saveCloneRetenue.inc.php',
-				{
+				'inc/saveCloneRetenue.inc.php', {
 				'ligne': ligne.html(),
 				'date': date,
 				'heure': heure,
@@ -97,29 +130,26 @@
 					},
 				"json"
 				)
-			// 
-				}
-			)
+			})
 		
 		$("#tableRetenues").on("click", ".del", function(){
 			if (confirm('Veuillez confirmer la suppression de cette retenue')) {
 			var moi = $(this);
-			var idretenue = $(this).parent().attr("id");
-			$.post('inc/delRetenue.inc.php',
-				{'idretenue': idretenue},
+			var idretenue = moi.parent().attr("id");
+			$.post('inc/delRetenue.inc.php', {
+				'idretenue': idretenue
+				},
 				function(resultat) {
 					if (resultat == 1) {
 						moi.parent().fadeOut().remove();
+						nb = $("#nbRetenues").text();
+						$("#nbRetenues").text(nb-resultat);
 						}
 					}
 				);
-
 			}
 			})
-	
 	})
-	
 
-	{/literal}
 </script>
 

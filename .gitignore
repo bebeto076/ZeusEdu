@@ -1,0 +1,16 @@
+*.tpl.php
+*.js.php
+*.sty.php
+*.html.php
+*.csv
+*.pdf
+*.bak
+*.zip
+*.odp
+*~
+photos/[0-9]+.jpg
+photosProfs/[a-zA-Z]+.jpg
+agenda
+edt
+adm
+mail

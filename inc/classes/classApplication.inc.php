@@ -2,7 +2,7 @@
 require_once (INSTALL_DIR."/phpMailer/class.phpmailer.php");
 
 class Application {
-		
+
 	function __construct() {
 		self::lireConstantes();
 		// sorties PHP en français
@@ -11,7 +11,7 @@ class Application {
 
 	/*
 	 * function lireConstantes
-	 * @param 
+	 * @param
 	 * @return : retourne les constantes globales pour toutes les applis
 	 */
 	public static function lireConstantes() {
@@ -36,7 +36,7 @@ class Application {
 			else die("config table not present");
 		self::DeconnexionPDO($connexion);
 	}
-	
+
 	/**
 	 * suppression de tous les échappements automatiques dans le tableau passé en argument
 	 * @param $tableau
@@ -52,8 +52,8 @@ class Application {
 			}
 	return $tableau;
 	}
-	
-	
+
+
 	### --------------------------------------------------------------------###
 	public function Normalisation() {
 		// si magic_quotes est "ON",
@@ -65,7 +65,7 @@ class Application {
 			}
 	}
 
-	/** 
+	/**
 	 * afficher proprement le contenu d'une variable précisée
 	 * le programme est éventuellement interrompu si demandé
 	 * @param : $data n'importe quel tableau ou variable
@@ -76,21 +76,21 @@ class Application {
 	if (func_num_args() > 0) {
 		$data = func_get_args();
 		}
-	echo "<pre>".print_r($data, 1)."</pre>";
+	echo "<pre>".print_r($data)."</pre>";
 	if ($die == true) die();
 	}
 
 	/***
 	 * renvoie le temps écoulé depuis le déclenchement du chrono
 	 * @param
-	 * @return string 
+	 * @return string
 	 */
 	public static function chrono () {
 		$temps = explode(' ', microtime());
 		return $temps[0]+$temps[1];
 		}
-		
-	/*** 
+
+	/***
 	* vider le répertoire "$dir" de tous les fichiers qu'il contient
 	* @param sting $dir
 	* @return void()
@@ -102,7 +102,7 @@ class Application {
 			@unlink ("$dir/$unFichier");
 			}
 		}
-	
+
 	/***
 	 * Connexion à la base de données précisée
 	 * @param PARAM_HOST : serveur hôte
@@ -119,8 +119,21 @@ class Application {
 								array(PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8"));
 			}
 		catch(Exception $e)	{
-			echo ("Une erreur est survenue lors de l'ouverture de la base de donn&eacute;es <br>");
-			echo ("Veuillez v&eacute;rifier le fichier config.inc.php");
+			$date = date("d/m/Y H:i:s");
+			echo "<style type='text/css'>";
+			echo ".erreurBD {width: 500px; margin-left: auto; margin-right: auto; border: 1px solid red; padding: 1em;}";
+			echo ".erreurBD .erreur {color: green; font-weight: bold}";
+			echo "</style>";
+
+			echo ("<div class='erreurBD'>");
+			echo ("<h3>A&iuml;e, a&iuml;e, a&iuml;e... Caramba...</h3>");
+			echo ("<p>Une erreur est survenue lors de l'ouverture de la base de donn&eacute;es.<br>");
+			echo ("Si vous &ecirc;tes l'administrateur et que vous tentez d'installer le logiciel, veuillez v&eacute;rifier le fichier config.inc.php </p>");
+			echo ("<p>Si le probl&egrave;me se produit durant l'utilisation r&eacute;guli&egrave;re du programme, essayez de rafra&icirc;chir la page (<span style='color: red;'>touche F5</span>)<br>");
+			echo ("Dans ce cas, <strong>vous n'&ecirc;tes pour rien dans l'apparition du souci</strong>: le serveur de base de donn&eacute;es est sans doute trop sollicit&eacute;...</p>");
+			echo ("<p>Veuillez rapporter le message d'erreur ci-dessous &agrave; l'administrateur du syst&egrave;me.</p>");
+			echo ("<p class='erreur'>Le $date, le serveur dit: ".$e->getMessage()."</p>");
+			echo ("</div>");
 			// print_r(array($host,$bd,$user,$mdp));
 			die();
 		}
@@ -135,18 +148,18 @@ class Application {
 	public static function DeconnexionPDO ($connexion) {
 		$connexion = Null;
 		}
-	
+
 	/**
 	 * retourne un array contenant une liste des périodes de l'année scolaire
 	 * @param $nbBulletins
-	 * @param $debut : premier bulletin à prendre en compte (implicite sauf si bulletin = 0 existe)
+	 * @param $debut : normalement, la première période est 1 mais on a parfois besoin de déclarer une période 0
 	 * @return array
 	 */
 	public function listePeriodes ($nbBulletins, $debut=1) {
 		return range($debut,$nbBulletins);
 		}
-		
-	
+
+
 	/***
 	 * renvoie la liste des applications existantes (et, éventuellement, seulement celles qui sont activées)
 	 * @param boolean $active
@@ -170,7 +183,7 @@ class Application {
 		self::DeconnexionPDO($connexion);
 		return $liste;
 	}
-	
+
 	/***
 	 * liste de tous les droits existants dans la BD pour les différentes applications
 	 * educ, prof, admin, direction,... et tous les autres statuts éventuels existants
@@ -178,7 +191,7 @@ class Application {
 	 * @param
 	 * @return array
 	 */
-	
+
 	public function listeDroits () {
 		$connexion = self::connectPDO(SERVEUR, BASE, NOM, MDP);
 		$sql = "SELECT userStatus FROM ".PFX."userStatus ORDER BY ordre";
@@ -192,7 +205,7 @@ class Application {
 		self::DeconnexionPDO($connexion);
 		return $liste;
 	}
-	
+
 	/**
 	 * retourne la liste des statuts disponibles dans l'application
 	 * semblable à la fonction listeDroits() mais retourne un tableau différent
@@ -217,8 +230,8 @@ class Application {
 
 		return $liste;
 	}
-	
-	
+
+
 	// --------------------------------------------------------------------
 	// enregistre le statut d'activation / désactivation des applis
 	function saveApplisStatus ($post) {
@@ -240,7 +253,7 @@ class Application {
 		self::DeconnexionPDO($connexion);
 		return $nbModifications;
 		}
-		
+
 	/**
 	 * modifie le statut de l'utilisateur pour l'application donnée
 	 * @param $acronyme
@@ -258,11 +271,10 @@ class Application {
 		self::DeconnexionPDO($connexion);
 		return $ok;
 	}
-	
-	/*
-	 * function affecteDroitsApplications
-	 * @param $usersList, $applications, $droits
+
+	/**
 	 * affectation des droits pour les applications aux utilisateurs
+	 * @param $usersList, $applications, $droits
 	 */
 	function affecteDroitsApplications ($usersList, $applications, $droits) {
 		if ((count($usersList)>0) && (count($applications)>0) && (count($droits)>0)) {
@@ -276,7 +288,7 @@ class Application {
 				foreach ($applications as $uneAppli) {
 					$data = array(':application'=>$uneAppli, ':userStatus'=>$droits, ':acronyme'=>$acronyme);
 					$resultat = $requete->execute($data);
-					if ($resultat === false) 
+					if ($resultat === false)
 						$bilan[] = array("acronyme"=>$acronyme, "application"=>$application, "droit"=>$droits, "statut"=>"echec");
 						else $bilan[] = array("acronyme"=>$acronyme, "application"=>$uneAppli, "droit"=>$droits, "statut"=>"OK");
 					}
@@ -285,34 +297,40 @@ class Application {
 			}
 		return $bilan;
 		}
-	
-	
-	/*** 
+
+
+	/**
 	 * renvoie la liste des paramètres généraux de l'ensemble de l'application en provenance de la BD
-	 * @param 
+	 * @param
 	 * @result array $listeParametres
 	 */
 	public function lireParametres () {
 		$connexion = self::connectPDO (SERVEUR, BASE, NOM, MDP);
-		$sql = "SELECT parametre, valeur, signification ";
-		$sql .= "FROM ".PFX."config";
+		$sql = "SELECT ordre, size, label, parametre, valeur, signification ";
+		$sql .= "FROM ".PFX."config ";
+		$sql .= "ORDER BY ordre ";
 		$resultat = $connexion->query($sql);
 		$listeParametres = array();
-		while ($ligne = $resultat->fetch()) {
-			$parametre = $ligne['parametre'];
-			$listeParametres[$parametre]['valeur'] = $ligne['valeur'];
-			$listeParametres[$parametre]['signification'] = $ligne['signification'];
+		if ($resultat) {
+			while ($ligne = $resultat->fetch()) {
+				$parametre = $ligne['parametre'];
+				$listeParametres[$parametre]['ordre']=$ligne['ordre'];
+				$listeParametres[$parametre]['label'] = $ligne['label'];
+				$listeParametres[$parametre]['valeur'] = $ligne['valeur'];
+				$listeParametres[$parametre]['signification'] = $ligne['signification'];
+				$listeParametres[$parametre]['size'] = $ligne['size'];
+				}
 			}
 		self::DeconnexionPDO($connexion);
 		return $listeParametres;
 		}
-		
+
 	/***
 	 * enregistre les paramètres généraux de l'application et renvoie le nombre de paramètres enregistrés
 	 * @param post
-	 * @result $nb 
+	 * @result $nb
 	 */
-	function saveParametres ($post) {
+	public function saveParametres ($post) {
 		$connexion = self::connectPDO (SERVEUR, BASE, NOM, MDP);
 		// vérification du nom des paramètres existants dans la BD afin d'éviter
 		// d'enregistrer un paramètre qui n'existerait pas
@@ -322,63 +340,81 @@ class Application {
 		while ($ligne = $resultat->fetch()) {
 			$listeParametres[] = addslashes($ligne['parametre']);
 			}
-		$resultat = 0;
+		$n = 0;
 		foreach ($post as $parametre => $value) {
 			if (in_array($parametre, $listeParametres)) {
 				$value = addslashes($value);
 				$sql = "INSERT INTO ".PFX."config ";
 				$sql .= "SET parametre='$parametre', valeur='$value' ";
 				$sql .= "ON DUPLICATE KEY UPDATE valeur='$value'";
-				$resultat += $connexion->exec($sql);
+				$resultat = $connexion->exec($sql);
+				if ($resultat > 0)
+					$n++;
 				}
 			}
 		self::DeconnexionPDO($connexion);
-		return $resultat;
+		return $n;
 		}
-	 
-	/*
-	 * function renvoiMdp
+
+	/**
+	 * génération d'un lien pour réinitialiser le mot de passe
 	 * @param $acronyme
-	 * renvoi du mot de passe à l'utilisateur dont l'acronyme est fourni
+	 * @return CONSTANTE USERNAME
 	 */
-	public function renvoiMdp ($acronyme) {
-		if (isset($acronyme)) {
-			$connexion = self::connectPDO(SERVEUR, BASE, NOM, MDP);
-			$sql = "SELECT nom, prenom, mail FROM ".PFX."profs ";
-			$sql .= "WHERE acronyme='$acronyme'";
-			$resultat = $connexion->query($sql);
-			if ($resultat) {
-				// cet acronyme existe. On a peut-etre une adresse e-mail
-				$ligne = $resultat->fetch();
-				$mail = $ligne['mail'];
-				if ($mail != '') {
-					// génération d'un nouveau mot de passe
-					$nouveauMotDePasse = self::generatePassword(8, 3);
-					// encodage md5
-					$md5Mdp = md5($nouveauMotDePasse);
-					$sql = "UPDATE ".PFX."profs SET mdp = '$md5Mdp' ";
-					$sql .= "WHERE acronyme='$acronyme'";
-					$resultat = $connexion->exec($sql);
-					mail($mail, PWD." ".TITREGENERAL, sprintf(NEWPWD, $nouveauMotDePasse),
-						 "From: ".ROBOT."@".DOMAIN);
-					mail(MAILADMIN, PWD, "$acronyme : $mail");
-					echo sprintf (NEWPWDSEND, $mail);
-					self::DeconnexionPDO($connexion);
-					}
-					else echo NOMAIL.ADMINISTRATOR;
-			}
+	public function renvoiMdp ($identite, $identiteReseau) {
+		$acronyme = $identite['acronyme'];
+		$mail = $identite['mail'];
+		if ($mail != '') {
+			// on peut générer un enregistrement dans la table des lostPasswd
+			$token = md5(microtime());
+
+			$connexion = self::connectPDO (SERVEUR, BASE, NOM, MDP);
+			$sql = "INSERT INTO ".PFX."lostPasswd ";
+			$sql .= "SET user='$acronyme', token='$token', date = NOW + INTERVAL 2 DAY ";
+			$sql .= "ON DUPLICATE KEY UPDATE token='$token', date = NOW + INTERVAL 2 DAY ";
+			$resultat = $connexion->exec($sql);
+			self::DeconnexionPDO($connexion);
+
+			$jSemaine = strftime('%A');
+			$date = date("d/m/Y");
+			$heure = date("H:i");
+
+			require_once('../smarty/Smarty.class.php');
+			$smarty = new Smarty;
+			$smarty->assign('date',$date);
+			$smarty->assign('heure',$heure);
+			$smarty->assign('jour',$jSemaine);
+			$smarty->assign('TITRECOURT',TITRECOURT);
+			$smarty->assign('expediteur',MAILADMIN);
+			$smarty->assign('ECOLE',ECOLE);
+			$smarty->assign('BASEDIR',BASEDIR);
+			// $smarty->assign('NEWPWD',NEWPWD);
+			$smarty->assign('identiteReseau',$identiteReseau);
+			$smarty->assign('identite',$identite);
+			$smarty->assign('token',$token);
+
+			$texteFinal =  $smarty->fetch('../templates/texteMailmdp.tpl');
+
+			require_once('../phpMailer/class.phpmailer.php');
+			$mail = new PHPmailer();
+			$mail->IsHTML(true);
+			$mail->CharSet = 'UTF-8';
+			$mail->From=MAILADMIN;
+			$mail->FromName=ADMINNAME;
+			$mail->AddAddress($identite['mail']);
+			$mail->Subject=NEWPWD;
+			$mail->Body = $texteFinal;
+			return (!$mail->Send());
 		}
-		else echo USERNAME;
-	}	 
-	 
-	
+	}
+
 	public function listeFlashInfos ($module) {
 		$connexion = self::connectPDO(SERVEUR, BASE, NOM, MDP);
 		$sql = "SELECT * FROM ".PFX."flashInfos ";
 		$sql .= "WHERE application = '$module' ";
 		$sql .= "ORDER BY date DESC";
 		$resultat = $connexion->query($sql);
-	
+
 		$flashInfos = array();
 		if ($resultat) {
 			$resultat->setFetchMode(PDO::FETCH_ASSOC);
@@ -389,13 +425,13 @@ class Application {
 		self::DeconnexionPDO($connexion);
 	return $flashInfos;
 	}
-	
+
 	### --------------------------------------------------------------------###
 	public static function repertoireActuel () {
 		$dir = array_reverse(explode("/",getcwd()));
 		return $dir[0];
 	}
-	
+
 	### --------------------------------------------------------------------###
 	public function accesApplication ($nomApplication) {
 		// vérifier que l'utilisateur est identifié pour l'application active
@@ -413,8 +449,8 @@ class Application {
 			header("Location: ".$BASEDIR."index.php");
 			else return true;
 	}
-	
-	
+
+
 	### --------------------------------------------------------------------###
 	private function generatePassword($length=9, $robustesse=0) {
 		$voyelles = "aeuy";
@@ -431,7 +467,7 @@ class Application {
 		if ($robustesse & 8) {
 			$consonnes .= "@#$%";
 		}
-	 
+
 		$password = "";
 		$alt = time() % 2;
 		for ($i = 0; $i < $length; $i++) {
@@ -445,7 +481,7 @@ class Application {
 		}
 		return $password;
 	}
-	
+
 	/**
 	* convertir les dates au format usuel jj/mm/AAAA en YY-mm-dd pour MySQL
 	* @param string $date date au format usuel
@@ -457,7 +493,7 @@ class Application {
 		$date = implode("-",$sqlArray);
 		return $date;
 		}
-	
+
 	/**
 	* convertir les date au format MySQL vers le format usuel
 	* @param string $date date au format MySQL
@@ -481,36 +517,36 @@ class Application {
 		$heure = implode(":",$sqlArray);
 		return $heure;
 		}
-		
+
 	public static function heurePHP ($heure) {
 		$heureArray = explode(":",$heure);
 		$sqlArray = array_reverse($heureArray);
 		$heure = implode(":",$sqlArray);
 		return $heure;
 		}
-		
-		/**
-		 * retourne le jour de la semaine correspondant à une date au format MySQL
-		 * @param string $dataMySQL
-		 * @return string
-		 */
-		public static function jourSemaineMySQL ($dateMySQL) {
-			$timeStamp = strtotime($dateMySQL);
-			return strftime("%A", $timeStamp);
+
+	/**
+	 * retourne le jour de la semaine correspondant à une date au format MySQL
+	 * @param string $dataMySQL
+	 * @return string
+	 */
+	public static function jourSemaineMySQL ($dateMySQL) {
+		$timeStamp = strtotime($dateMySQL);
+		return strftime("%A", $timeStamp);
+	}
+
+	/**
+	* Fonction de conversion de date du format français (JJ/MM/AAAA) en Timestamp.
+	* @param string $date Date au format français (JJ/MM/AAAA)
+	* @return integer Timestamp en seconde
+	* http://www.julien-breux.com/2009/02/17/fonction-php-date-francaise-vers-timestamp/
+	*/
+	public static function dateFR2Time($date)	{
+		  list($day, $month, $year) = explode('/', $date);
+		  $timestamp = mktime(0, 0, 0, $month, $day, $year);
+		  return $timestamp;
 		}
-		
-		/**
-		* Fonction de conversion de date du format français (JJ/MM/AAAA) en Timestamp.
-		* @param string $date Date au format français (JJ/MM/AAAA)
-		* @return integer Timestamp en seconde
-		* http://www.julien-breux.com/2009/02/17/fonction-php-date-francaise-vers-timestamp/
-		*/
-		public static function dateFR2Time($date)	{
-			  list($day, $month, $year) = explode('/', $date);
-			  $timestamp = mktime(0, 0, 0, $month, $day, $year);
-			  return $timestamp;
-			}
-		
+
 	/**
 	 * Extrait la liste des fichiers présentes dans un répertoire
 	 * @param $repertoire
@@ -522,9 +558,44 @@ class Application {
 		$liste = array_diff(scandir($repertoire, 0), $exclus);
 		return $liste;
 	}
-	
-	
+
 	/**
+	 * date d'aujourd'hui
+	 * @param void()
+	 * @return string
+	 */
+	public static function dateNow(){
+		return date('d/m/Y');
+		}
+
+	/**
+	* heure à l'instant
+	* @param void()
+	* @return string
+	*/
+	public static function timeNow(){
+		return date('H:m:i');
+		}
+
+	/**
+	 * date dans un an à partir d'aujourd'hui
+	 * @param void()
+	 * @return string
+	 */
+	public static function dateUnAn(){
+		return date('d/m/Y',strtotime('+365 days'));
+	}
+
+	/**
+	* date dans un mois à partir d'aujourd'hui
+	* @param void()
+	* @return string
+	*/
+	public static function dateUnMois(){
+		return date('d/m/Y',strtotime('+1 month'));
+	}
+
+	 /**
 	 * Recursive function to scan a directory with * scandir() *
 	 *
 	 * @param String $rootDir
@@ -570,8 +641,7 @@ class Application {
 		}
 		return $allData;
 	}
-	
-		
+
 	/**
 	 * Établir la liste des utilisateurs (profs) sans cours
 	 * @param
@@ -584,7 +654,7 @@ class Application {
 		$sql .= "acronyme NOT IN (SELECT acronyme FROM ".PFX."profsCours) ";
 		$sql .= "ORDER BY REPLACE(REPLACE (nom,' ',''),'\'','')";
 		$resultat = $connexion->query($sql);
-	
+
 		$users = array();
 		while ($ligne = $resultat->fetch()){
 			$acronyme = $ligne['acronyme'];
@@ -594,9 +664,8 @@ class Application {
 		return $users;
 		}
 
-
 	/**
-	 * Suppression de l'utilisateur désigné par son "acronym"
+	 * Suppression de l'utilisateur désigné par son "acronyme"
 	 * @param string $acronyme
 	 * @return boolean statut d'erreur: OK ou PAS OK
 	 */
@@ -612,11 +681,11 @@ class Application {
 	   self::DeconnexionPDO ($connexion);
 	   return !($erreur1 || $erreur2);
 	   }
-	   
-	/*
-	* function derniersConnectes
-	* @param $limite
+
+	/**
 	* liste des derniers utilisateurs connectés
+	* @param $limite
+	* @return array
 	*/
 	public function derniersConnectes($limite) {
 	   $connexion = self::connectPDO(SERVEUR, BASE, NOM, MDP);
@@ -631,28 +700,45 @@ class Application {
 	   self::DeconnexionPDO($connexion);
 	   return $tableau;
 	   }
-	
+
 	/**
-	* On fournit une liste de tables; la procédure fabrique un fichiers .sql permettant la restauration des tables désignées
+	 * vidage de la table dont on fournit le nom
+	 * @param string : $table
+	 * @return boolean
+	 */
+	public static function clearTable ($table) {
+		$connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
+		$sql = "TRUNCATE ".PFX."$table";
+		$resultat = $connexion->exec($sql);
+		Application::DeconnexionPDO ($connexion);
+		if ($resultat)
+			return true;
+			else return false;
+		}
+
+	/**
+	* On fournit une liste de tables; la procédure fabrique un fichier .sql permettant la restauration des tables désignées
 	* @param $post : formulaire dans lequel on a coché les noms des tables à sauvegarder
 	* @return string : nom du fichier .sql.gz créé
 	*/
-	function backupTables($post) {
+	public function backupTables($post) {
+
 		$listeTables = array();
 		// seuls les inputs dont le nom commence par "check" sont à considérer
 		foreach ($post as $unItem=>$value) {
 			if (strstr($unItem, "check")) {
-			$data = explode("_",$unItem);
-			$listeTables[] = PFX.$data[1];
+				$data = explode("_",$unItem);
+				$listeTables[] = PFX.$data[2];
+				}
 			}
-		}
 		$nb = count($listeTables);
+
 		$nbTotal = $this->DBnumTables();
 		$listeTables = implode(" ",$listeTables);
 		if ($nb < $nbTotal)
 			$fileName = date("Y-m-d:Hms")."_$nb-tables.sql";
 			else $fileName = date("Y-m-d:Hms")."_complet.sql";
-		
+
 		try {
 		$output = exec("mysqldump -u ".NOM." --host=".SERVEUR." --password=".MDP." ".BASE." --tables $listeTables > save/$fileName") ;
 		}
@@ -662,7 +748,7 @@ class Application {
 		system("gzip save/$fileName");
 		return $fileName;
 		}
-		
+
 	/**
 	 * retourne le nombre total de tables de la BD
 	 * @param
@@ -681,15 +767,15 @@ class Application {
 	}
 
 	/**
-	 * function lireFlashInfos
-	 * @param $$module
 	 * retourne tous les Flash Infos d'un module
+	 * @param $$module
+	 * @return array
 	 */
 	public function lireFlashInfos ($module) {
 		$connexion = self::connectPDO(SERVEUR, BASE, NOM, MDP);
 		$sql = "SELECT * FROM ".PFX."flashInfos ";
 		$sql .= "WHERE application ='$module' ";
-		$sql .= "ORDER BY date DESC, heure DESC";
+		$sql .= "ORDER BY date DESC, heure DESC ";
 		$resultat = $connexion->query($sql);
 		$flashInfos=array();
 		if ($resultat) {
@@ -705,21 +791,17 @@ class Application {
 	 * changement d'utilisateur en gardant les droits admins (Application)
 	 * @param $acronyme
 	 * @return string
-	 * 
 	 */
 	public function changeUserAdmin ($acronyme) {
-		// liste de toutes les applications avec leurs droits
-		$listeApplications = $_SESSION[APPLICATION]->getApplications();
-		$appliAdmin = array('admin'=>$listeApplications['admin']);
-		
+		// conserver la session de l'admin courant
+		$admin = $_SESSION[APPLICATION];
+
 		// prépartion d'un nouvel utilisateur
-		$toto = new user($acronyme);
-		// lui conférer les droits "admin" sur ses applications
-		$toto->setApplicationsAdmin();
-		// lui ajouter les droits "admin" sur l'admin
-		$toto->addAppli($appliAdmin);
-		// l'affecter à la session 
-		$_SESSION[APPLICATION] = $toto;
+		$alias = new user($acronyme);
+		// mise en mémoire de l'administrateur
+		$alias->setAlias($admin);
+
+		$_SESSION[APPLICATION] = $alias;
 		$qui = $_SESSION[APPLICATION]->identite();
 		return $qui['prenom']." ".$qui['nom'].": ".$qui['acronyme'];
 	}
@@ -728,10 +810,8 @@ class Application {
 	/**
 	 * renvoie la liste des utilisateurs qui disposent du statut global $status dans l'application
 	 * permet de retrouver tous les "admins", par exemple.
-	 * 
 	 * @param $status : string
 	 * @return array
-	 * 
 	 */
 	public function getUserByStatus ($status) {
 		$connexion = self::connectPDO(SERVEUR, BASE, NOM, MDP);
@@ -748,15 +828,13 @@ class Application {
 		return $listeUsers;
 		}
 
-	/* 
-	 * function lastAccess 
-	 * 
+	/**
+	 * liste les accès de l'utilisateur indiqué entre deux bornes
 	 * @param $user		nom de l'utilisateur concerné
 	 * @param $nombre  nombre d'accès à traiter
 	 * @param $from		nombre de lignes à laisser tomber en début
 	 * @return array : liste des derniers accès à l'application
-	 * 
-	 * */
+	 */
 	public function lastAccess ($from, $nombre, $user) {
 		$connexion = self::connectPDO(SERVEUR, BASE, NOM, MDP);
 		$sql = "SELECT ip,host,date,DATE_FORMAT(heure,'%H:%i') as heure ";
@@ -776,35 +854,11 @@ class Application {
 		return $acces;
 		}
 
-	/** 
-	 * function bannedIP 
-	 * 
-	 * @param $ip   	adresse IP
-	 * 
-	 * retourne "vrai" si adresse IP bannie
-	 * */
-	public function bannedIP ($ip) {
-		$connexion = self::connectPDO(SERVEUR, BASE, NOM, MDP);
-		$sql = "SELECT ip ";
-		$sql .= "FROM ".PFX."banIP ";
-		$sql .= "WHERE ip='$ip' ";
-		$resultat = $connexion->query($sql);
-		$listeIP = array();
-		if ($resultat) {
-			$resultat->setFetchMode(PDO::FETCH_ASSOC);
-			while ($ligne = $resultat->fetch()) 
-				$listeIP[] = $ligne['ip'];
-			}
-		Application::deconnexionPDO($connexion);
-		return (in_array($ip, $listeIP));
-		}
-
-	/* 
-	 * function dirFiles
-	 * @param $dir : répertoire dont on veut obtenir la liste du contenu
-	 * 
+	/**
 	 * renvoie la liste de tous les fichiers d'un répertoire
-	 * */
+	 * @param $dir : répertoire dont on veut obtenir la liste du contenu
+	 * @return array
+	 */
 	public function dirFiles ($dir) {
 		$listeFichiers = array();
 		if ($handle = @opendir("$dir")) {
@@ -812,15 +866,14 @@ class Application {
 				if (($file != '.') && ($file != '..'))
 					$listeFichiers[] = $file;
 				}
-			closedir($handle);			
+			closedir($handle);
 			}
 		return $listeFichiers;
 		}
 
 
-	/***
+	/**
 	 * crée un fichier zippé à partir de tous les fichiers qui se trouvent dans le répertoire désigné
-	 * 
 	 * @param $dir : répertoire où se trouvent les fichiers à zipper et le fichier à enregistrer
 	 * @param $filename : nom du fichier à créer
 	 */
@@ -842,31 +895,31 @@ class Application {
 	 * @param $niveau : niveau d'étude concerné
 	 * @return void()
 	 */
-	function zipFilesNiveau ($dir, $listeClasses) {
+	function zipFilesNiveau ($dir, $bulletin, $listeClasses) {
 		$niveau = substr($listeClasses[0],0,1);
 		$zip = new ZipArchive();
-		if ($zip->open("$dir/niveau_$niveau.zip", ZIPARCHIVE::CREATE)!==TRUE) {
-			exit("Impossible d'ouvrir <niveau_$niveau.zip>\n");
+		if ($zip->open("$dir/niveau_$niveau-Bulletin_$bulletin.zip", ZIPARCHIVE::CREATE)!==TRUE) {
+			exit("Impossible d'ouvrir <niveau_$niveau-Bulletin--_$bulletin.zip>\n");
 			}
 		$listeFichiers = $this->dirFiles($dir);
 		foreach ($listeClasses as $uneClasse) {
-			$zip->addFile("$dir/$uneClasse.pdf");
+			$zip->addFile("$dir/$uneClasse-$bulletin.pdf");
 			}
 		$zip->close();
 		}
-		
-	/* 
-	 * function checkIP 
+
+	/**
+	 * renvoie "true" si l'adresse IP est déjà connue dans la table des logins pour cet utilisateur
 	 * @param $ip	: adresse IP
 	 * @param $user	: nom de l'utilisateur
-	 * renvoie "true" si l'adresse IP est déjà connue dans la table des logins pour cet utilisateur
-	 * */ 
+	 * @return integer
+	 */
 	 public function checkIP ($ip, $user){
 		$connexion = self::connectPDO(SERVEUR, BASE, NOM, MDP);
 		$sql = "SELECT COUNT(*) AS nb ";
 		$sql .= "FROM ".PFX."logins ";
 		$sql .= "WHERE ip='$ip' AND UPPER(user)='$user' ";
-		$sql .= "ORDER BY date DESC, heure DESC";
+		// $sql .= "ORDER BY date DESC, heure DESC ";
 		$resultat = $connexion->query($sql);
 		$nb = 0;
 		if ($resultat) {
@@ -877,31 +930,31 @@ class Application {
 		return $nb;
 		}
 
-	/** 
-	 * function mailAlerte
-	 * @param $user	: paramètres utilisateurs
-	 * @param $type	: type d'alerte
-	 * 
+	/**
 	 * Envoie un mail d'alerte à l'utilisateur et aux admins
-	 * 
+	 * @param $acronyme : identifiant de l'utilisateur
+	 * @param $user	: l'objet "utilisateur"
+	 * @param $type	: type d'alerte
+	 * @param $data : données supplémentaires sous forme d'arrey
+	 * @return boolean
 	 */
-	public function mailAlerte($user, $type, $data=Null){
+	public function mailAlerte($acronyme, $user, $type, $data=Null){
 		// liste des mails des administrateurs
 		$listeMailing = $this->getUserByStatus('admin');
 		// userdata
 		$identification = $user->identification();
 		$ip = $identification['ip'];
 		$hostname = $identification['hostname'];
-		$acronyme = $user->getAcronyme();
+		// $acronyme = $user->getAcronyme();
 		$userMail = $user->getMail();
-		
+
 		$jSemaine = strftime('%A');
 		$date = date("d/m/Y");
 		$heure = date("H:i");
-		
+
 		switch ($type) {
 			case 'mdp':
-				$sujet = sprintf(ERREURLOGIN, TITRECOURT);			
+				$sujet = sprintf(ERREURLOGIN, TITRECOURT);
 				$texteAdmin = sprintf(ERREURLOGINADMIN, $acronyme, $data['mdp'], $jSemaine, $date, $heure, $ip, $hostname, $userMail);
 				if ($user->userExists($acronyme)) {
 					$texteUser = sprintf(ERREURLOGINUSER, $acronyme, $data['mdp'], $jSemaine, $date, $heure, TITRECOURT, $ip, $hostname);
@@ -910,14 +963,14 @@ class Application {
 			case 'newIP':
 				$sujet = sprintf(NOUVELLEIP, TITRECOURT);
 				$texteAdmin = sprintf(NOUVELLEIPADMIN, $ip, $hostname, $acronyme, $jSemaine, $date, $heure, $userMail);
-				if ($user->userExists($acronyme)) 
+				if ($user->userExists($acronyme))
 					$texteUser = sprintf(NOUVELLEIPUSER, $ip, $hostname, $jSemaine, $date, $heure, TITRECOURT);
 				break;
 			default:
 				//don't care
 				break;
 			}
-		$mail = new PHPmailer(); 
+		$mail = new PHPmailer();
 		$mail->IsHTML(true);
 		$mail->CharSet = 'UTF-8';
 		$mail->From=MAILADMIN;
@@ -925,13 +978,13 @@ class Application {
 		$envoiMail = true;
 		// avertir les administrateurs
 		foreach ($listeMailing as $admin) {
-			$mail->AddAddress($admin['mail']); 
-			$mail->Subject=$sujet; 
-			$mail->Body=$texteAdmin; 
+			$mail->AddAddress($admin['mail']);
+			$mail->Subject=$sujet;
+			$mail->Body=$texteAdmin;
 			}
 		if(!$mail->Send())
 			$envoiMail = false;
-			// echo $mail->ErrorInfo; 
+			// echo $mail->ErrorInfo;
 		// prévenir l'utilisateur
 			if ($userMail) {
 				$mail->ClearAddresses();
@@ -981,11 +1034,10 @@ class Application {
 					);
 	}
 
-	/***
+	/**
 	 * recherche les éventuels hiatus entre la table importée et la structure de la base de données
 	 * @param $entete
 	 * @param array $champs : liste des champs à trouver
-	 *
 	 * @return array: éléments de l'entete du fichier CSV qui ne figurent pas dans la table de la BD et inversement
 	 */
 	public function hiatus ($entete, $champs) {
@@ -998,63 +1050,168 @@ class Application {
 			foreach ($hiatus2 as $unProbleme)
 				$lesProblemes[1][] = $unProbleme;
 			}
-	return $lesProblemes;
+		return $lesProblemes;
 		}
 
 	/**
-	 * transforme un fichier .csv uploadé en un array()
-	 *
-	 * @param string $fileName : nom du fichier
-	 * @return $aarray
-	 */
-	public function csv2array ($fileName) {
-	$handle = fopen("$fileName.csv","r");
-	$tableau = array();
-	while (($data = fgetcsv($handle,0)) !== FALSE) {
-		$tableau[] = $data;
-		}
-	fclose($handle);
-	return $tableau;
-	}
-		
-	/**
-	 * liste de toutes les tables qui présentent un champ nommé "matricule"
-	 * destinée à la suppression des anciens élèves dans toutes les tables de la BD
-	 *
-	 * @param
+	 * retourne la liste des champs d'une liste réellement trouvés dans une deuxième liste
+	 * @param $champsCherches
+	 * @param $listeChamps
 	 * @return array
 	 */
-	function listeTablesAvecChamp ($champ){
-		$connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
+	public function champsCherches($champsCherches,$listeChamps) {
+		return array_intersect($champsCherches,$listeChamps);
+	}
+
+	/**
+	 * transforme un fichier .csv uploadé en un array()
+	 * @param string $fileName : nom du fichier
+	 * @return $array
+	 */
+	public function csv2array ($fileName) {
+		$handle = fopen("$fileName.csv","r");
+		$tableau = array();
+		while (($data = fgetcsv($handle,0)) !== FALSE) {
+			$tableau[] = $data;
+			}
+		fclose($handle);
+		return $tableau;
+	}
+
+	/**
+	* liste de toutes les tables qui présentent un champ (typiquement, "matricule")
+	* destinée à la suppression des anciens élèves dans toutes les tables de la BD
+	* si pas de champ spécifié, retourne toutes les tables
+	* @param string $champ
+	* @return array
+	*/
+	public function listeTablesAvecChamp ($champ=''){
+		$connexion = self::connectPDO(SERVEUR, BASE, NOM, MDP);
 		// liste de toutes les tables
 		$sql = "SHOW TABLES FROM ".BASE." LIKE '".PFX."%'";
 		$resultat = $connexion->query($sql);
 		$listeTables = array();
-		if ($resultat) 
-			while ($ligne = $resultat->fetch()) 
+		if ($resultat)
+			while ($ligne = $resultat->fetch()) {
 				$listeTables[] = current($ligne);
-		$n=0;
-		foreach ($listeTables as $uneTable) {
-			$sql = "DESCRIBE $uneTable";		
-			$resultat = $connexion->query($sql);
-			$found = false;
-			while (!$found && $ligne = $resultat->fetch()) {
-				$found = ($ligne['Field'] == $champ);
 				}
-			if (!$found)
-				unset($listeTables[$n]);
-			$n++;
+			if ($champ != '') {
+				$n=0;
+				foreach ($listeTables as $uneTable) {
+					$sql = "DESCRIBE $uneTable";
+					$resultat = $connexion->query($sql);
+					$found = false;
+					while (!$found && $ligne = $resultat->fetch()) {
+						$found = ($ligne['Field'] == $champ);
+						}
+					if (!$found)
+					unset($listeTables[$n]);
+					$n++;
+					}
 			}
-		Application::DeconnexionPDO($connexion);
-		return $listeTables;
+	self::DeconnexionPDO($connexion);
+	return $listeTables;
 	}
-		
+
+	/**
+	* fournit la liste triée des tables pour l'ensemble des applications commen indiqué dans la table appliTables
+	* @param void()
+	* @return array
+	*/
+	function listeTablesParAppli() {
+		$connexion = self::connectPDO(SERVEUR, BASE, NOM, MDP);
+		$sql = "SELECT application, nomTable ";
+		$sql .= "FROM ".PFX."appliTables ";
+		$resultat = $connexion->query($sql);
+		$listeTables = array();
+		if ($resultat) {
+			$resultat->setFetchMode(PDO::FETCH_ASSOC);
+			while ($ligne = $resultat->fetch()) {
+				$application = $ligne['application'];
+				$nomTable = PFX.$ligne['nomTable'];
+				$listeTables[$application][] = $nomTable;
+			}
+		}
+		self::DeconnexionPDO ($connexion);
+	return $listeTables;
+	}
+
+	/**
+	* fournit la liste *non triée* des tables et des applications liées comme indiqué dans la table appliTables
+	* @param void()
+	* @return array
+	*/
+	public function listeTablesEtApplis(){
+		$connexion = self::connectPDO(SERVEUR, BASE, NOM, MDP);
+		$sql = "SELECT application, nomTable ";
+		$sql .= "FROM ".PFX."appliTables ";
+		$sql .= "ORDER BY application ";
+		$resultat = $connexion->query($sql);
+		$listeTables = array();
+		if ($resultat) {
+		$resultat->setFetchMode(PDO::FETCH_ASSOC);
+		while ($ligne = $resultat->fetch()) {
+			$application = $ligne['application'];
+			$nomTable = PFX.$ligne['nomTable'];
+			$listeTables[$nomTable]= $application;
+		}
+		}
+		self::DeconnexionPDO ($connexion);
+	return $listeTables;
+	}
+
+	/**
+	* fournit la liste des associations entre les tables et les applis, y compris la valeur Null pour une table associée à aucune appli
+	* (ce qui serait une erreur du programmeur d'une appli)
+	* dans ce cas, la $listeTablesEtApplis ne contiendrait pas d'entrée pour une table orpheline
+	* @param array $listeToutesTables
+	* @param array $listeTablesEtApplis
+	* @return array
+	*/
+	public function listeAssocTablesApplis($listeToutesTables, $listeTablesEtApplis) {
+		$listeAssoc = array();
+		foreach ($listeToutesTables as $nomTable)
+		if (array_key_exists($nomTable, $listeTablesEtApplis))
+			$listeAssoc[$nomTable] = $listeTablesEtApplis[$nomTable];
+			else $listeAssoc[$nomTable] = Null;
+	return $listeAssoc;
+	}
+
+	/**
+	* enregistre les liens entre applications et tables à destination de la table appliTables
+	* @param array $post
+	* @return integer nb
+	*/
+	public function saveLinkApplisTables ($post) {
+		$connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
+		$sql = "INSERT INTO ".PFX."appliTables ";
+		$sql .= "SET nomTable = :nomTable, application= :application ";
+
+		$requete = $connexion->prepare($sql);
+		// suppression de la table existante
+		$sql = "TRUNCATE ".PFX."appliTables ";
+		$connexion->exec($sql);
+		$nb = 0;
+		foreach ($post as $table=>$appli) {
+			if (substr($table, 0, 6) == 'table_') {
+			$table = explode('_', $table);
+			$nomTable = $table[2];
+			$data = array(':application'=>$appli, ':nomTable'=>$nomTable);
+			$nb +=$requete->execute($data);
+			}
+		}
+	Application::DeconnexionPDO ($connexion);
+	return $nb;
+	}
+
 	/**
 	 * fournit la liste des tables pour l'application donnée
 	 * si pas d'application précisée, donne la liste de toutes les tables
 	 * cette liste des tables doit, elle-même, figurer dans une table
 	 * de l'application 'admin'
-	 * @param $base, $application
+	 * @param $base
+	 * @param  $application
+	 * @return array
 	  */
 	function listeTables($base, $application=Null) {
 		$connexion = self::connectPDO(SERVEUR, BASE, NOM, MDP);
@@ -1078,10 +1235,11 @@ class Application {
 		self::DeconnexionPDO ($connexion);
 		return $listeTables;
 	}
+
 	/**
-	* function SQLtableFields2array
-	* @param $table
 	* renvoie un tableau indiquant les noms des champs de la table MySQL indiquée
+	* @param $table
+	* @return array
 	*/
 	public static function SQLtableFields2array ($table) {
 	   $connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
@@ -1096,11 +1254,11 @@ class Application {
 	   Application::DeconnexionPDO ($connexion);
 	   return $champs;
 	   }
-	   
+
 	/**
 	 * Enregistrement d'un fichier CSV dans la table MySQL correspondante
 	 * Le contenu du fichier CSV a été préalablement vérifié et validé à l'écran
-	 * 
+	 *
 	 * @param $table
 	 * @return array : 'erreurs'=>nbErreurs, 'ajouts'=>nbAjouts
 	 */
@@ -1113,14 +1271,14 @@ class Application {
 		$primKeys = $this->tablePrimKeys($table);
 		// détermination des champs pour la requête UPDATE
 		$champsUpdate = array_diff($champsInsert, $primKeys);
-	
+
 		$sql = "INSERT INTO ".PFX."$table (".implode(',', $champsInsert).") VALUES (";
 		$valuesInsert=array();
-		foreach ($champsInsert as $unChamp) 
+		foreach ($champsInsert as $unChamp)
 			$valuesInsert[] = ":".$unChamp;
 		$sql .= implode(',',$valuesInsert).") ";
 		$valuesUpdate = array();
-		foreach ($champsUpdate as $unChamp) 
+		foreach ($champsUpdate as $unChamp)
 			 $valuesUpdate[]= "$unChamp=:$unChamp";
 
 		// si tous les champs sont des clés primaires, il n'y a pas d'Update possible
@@ -1141,51 +1299,51 @@ class Application {
 	}
 
 	/**
-	 * function newPasswdAssign 
+	 * function newPasswdAssign
 	 *
 	 * @param array $table : liste des élèves dont il faut réinitialiser le pwd
 	 * @return array : liste des erreurs et des réussites
 	 */
 	public function newPasswdAssign ($table) {
-	$tableauCSV = self::csv2array($table);
-	$entete = array_shift($tableauCSV);
-	$erreurs = 0; $ajouts = 0;
-	$tousEleves = self::listeTousEleves();
-	$connexion = self::connectPDO(SERVEUR, BASE, NOM, MDP);
-	foreach ($tableauCSV as $unEleve) {
-		$matricule = $unEleve[0];
-		$passwd = $unEleve[2];
-		$eleve = $tousEleves[$matricule];
-		$nom = $tousEleves[$matricule]['nom'];
-		$prenom = $tousEleves[$matricule]['prenom'];
-		$username = self::username($matricule, $nom, $prenom);
-		$sql = "INSERT INTO ".PFX."passwd ";
-		$sql .= "SET matricule='$matricule',passwd='$passwd', user='$username' ";
-		// en cas de doublon, seul le "mot de passe" est modifié
-		$sql .= "ON DUPLICATE KEY UPDATE passwd='$passwd' ";
-		$resultat = $connexion->exec($sql);
-		if ($resultat === false)
-			$erreurs++;
-			else $ajouts++;
-		}
-	self::DeconnexionPDO($connexion);
-	return array("erreurs"=>$erreurs, "ajouts"=>$ajouts);
+		$tableauCSV = self::csv2array($table);
+		$entete = array_shift($tableauCSV);
+		$erreurs = 0; $ajouts = 0;
+		$tousEleves = self::listeTousEleves();
+		$connexion = self::connectPDO(SERVEUR, BASE, NOM, MDP);
+		foreach ($tableauCSV as $unEleve) {
+			$matricule = $unEleve[0];
+			$passwd = $unEleve[2];
+			$eleve = $tousEleves[$matricule];
+			$nom = $tousEleves[$matricule]['nom'];
+			$prenom = $tousEleves[$matricule]['prenom'];
+			$username = self::username($matricule, $nom, $prenom);
+			$sql = "INSERT INTO ".PFX."passwd ";
+			$sql .= "SET matricule='$matricule',passwd='$passwd', user='$username' ";
+			// en cas de doublon, seul le "mot de passe" est modifié
+			$sql .= "ON DUPLICATE KEY UPDATE passwd='$passwd' ";
+			$resultat = $connexion->exec($sql);
+			if ($resultat === false)
+				$erreurs++;
+				else $ajouts++;
+			}
+		self::DeconnexionPDO($connexion);
+		return array("erreurs"=>$erreurs, "ajouts"=>$ajouts);
 	}
 
 	public static function stripAccents($string){
 	return strtr($string,'àáâãäçèéêëìíîïñòóôõöùúûüýÿÀÁÂÃÄÇÈÉÊËÌÍÎÏÑÒÓÔÕÖÙÚÛÜÝ',
 		'aaaaaceeeeiiiinooooouuuuyyAAAAACEEEEIIIINOOOOOUUUUY');
 		}
-		
+
 	private function stripIndesirables ($string) {
 		$indesirables = array(" ", "-", "'");
 		$string = str_replace($indesirables,"",$string);
 		return $string;
 		}
-		
+
 	/**
 	 * attribue un nom d'utilisateur à un élèves première lettre du prénom, 7 lettres du nom + matricule
-	 * @param $matricules
+	 * @param $matricule
 	 * @param $nom
 	 * @param $prenom
 	 * @return string
@@ -1204,15 +1362,15 @@ class Application {
 	 */
 	function nomsChampsBD($champs) {
 		$nomChamps = array();
-		foreach ($champs as $unChamp) 
+		foreach ($champs as $unChamp)
 			$nomChamps[] = $unChamp['Field'];
 		return $nomChamps;
 	}
-		
+
 	/**
-	 * function tablePrimKeys
-	 * retourne les noms des champs qui sont Primary keys
+	 * retourne les noms des champs d'une $table MySQL qui sont Primary keys
 	 * @param $table
+	 * @return array
 	 */
 	function tablePrimKeys ($table) {
 		$connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
@@ -1238,9 +1396,9 @@ class Application {
 	}
 
 	/**
-	 * function SQLtable2array
+	 * renvoie le résultat de la requête SQL sous forme d'array
 	 * @param string $table : nom de la table à convertir en array
-	 * @return $tableau
+	 * @return $tableau : array
 	 */
 	function SQLtable2array ($table) {
 		$connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
@@ -1254,21 +1412,171 @@ class Application {
 		Application::DeconnexionPDO ($connexion);
 		return $tableau;
 	}
-	
+
 	/**
 	 * produit un tableau de la liste des élèves provenant d'un fichier CSV transformé en array
-	 *
 	 * @param array $tableau
 	 * @return $array : liste des matricules des élèves
 	 */
-	function tableau2listeEleves($tableau) {
+	public function tableau2listeEleves($tableau) {
 		$entete = array_shift($tableau);
-		if ($entete[0] != 'matricule') die('tableau mal formé');
+		if ($entete[0] != 'matricule') die('tableau mal form&eacute;');
 		$listeMatricules = array();
 		foreach ($tableau as $uneLigne) {
 			$listeMatricules[] = $uneLigne[0];
 		}
 		return $listeMatricules;
 	}
+
+	/**
+	 * vider un répertoire complet et l'effacer
+	 * http://php.net/manual/fr/function.rmdir.php
+	 * @param $dir
+	 * @return void()
+	 */
+	function rrmdir($dir) {
+		if (is_dir($dir)) {
+		$objects = scandir($dir);
+		foreach ($objects as $object) {
+			if ($object != "." && $object != "..") {
+				if (filetype($dir."/".$object) == "dir") rrmdir($dir."/".$object); else unlink($dir."/".$object);
+				}
+			}
+		reset($objects);
+		rmdir($dir);
+		}
+	}
+
+	/**
+	 * retourne la liste des $nbJours dates ouvrables suivantes d'une date donnée
+	 * @param string $date
+	 * @param integer $nbJours : nombre de jours ouvrables souhaités
+	 * @return array
+	 */
+	public function datesSuivantes($date, $nbJours='1', $debutInclus=true) {
+		$fetes = array('25/12/2014','01/01/2015');
+		$listeDates = array();
+		$dateLendemain = $date;
+		if ($debutInclus)
+			$listeDates = array($date);
+			else $listeDates = array();
+		while ($nbJours >= 1) {
+			$timeStamp = strtotime(str_replace('/','-',$dateLendemain).'1 weekday');
+			$dateLendemain = date('d/m/Y',$timeStamp);
+			if (!(in_array($dateLendemain, $fetes))){
+				$listeDates[]=$dateLendemain;
+				$nbJours--;
+			}
+		}
+		return $listeDates;
+		}
+
+	/**
+	* Création d'un lien enregistré dans la base de données pour la récupération du mdp
+	* @param void()
+	* @return string
+	*/
+	public function createPasswdLink($userName){
+		$link = md5(microtime());
+		$connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
+		$sql = "INSERT INTO ".PFX."lostPasswd ";
+		$sql .= "SET user='$userName', token='$link', date=NOW() + INTERVAL 2 DAY ";
+		$sql .= "ON DUPLICATE KEY UPDATE token='$link', date=NOW() + INTERVAL 2 DAY ";
+		$resultat = $connexion->exec($sql);
+		Application::DeconnexionPDO($connexion);
+		return $link;
+		}
+
+	/**
+	 * Envoie un mail de rappel de mot de passe à l'utlisateur dont on a l'adresse
+	 * @param $link : le lien de l'adresse où changer le mdp
+	 * @param $identite	: toutes les informations d'identité de l'utilisateur
+	 * @param $identiteReseau : informations relatives à la connexion (IP,...)
+	 * @return boolean
+	 */
+	public function mailPasswd($link, $identite, $identiteReseau){
+		$jSemaine = strftime('%A');
+		$date = date("d/m/Y");
+		$heure = date("H:i");
+
+		$smarty = new Smarty;
+		$smarty->assign('date',$date);
+		$smarty->assign('heure',$heure);
+		$smarty->assign('jour',$jSemaine);
+		$smarty->assign('expediteur',MAILADMIN);
+		$smarty->assign('identiteReseau',$identiteReseau);
+		$smarty->assign('identite',$identite);
+		$smarty->assign('ECOLE',ECOLE);
+		$smarty->assign('BASEDIR',BASEDIR);
+		$smarty->assign('TITRECOURT',TITRECOURT);
+		$smarty->assign('token',$link);
+		$texteFinal =  $smarty->fetch('../templates/texteMailmdp.tpl');
+		require_once('../phpMailer/class.phpmailer.php');
+		$mail = new PHPmailer();
+		$mail->IsHTML(true);
+		$mail->CharSet = 'UTF-8';
+		$mail->From=MAILADMIN;
+		$mail->FromName=ADMINNAME;
+		$mail->AddAddress($identite['mail']);
+		$mail->AddBCC(MAILADMIN);
+		$mail->Subject=NEWPWD;
+		$mail->Body = $texteFinal;
+		return (!$mail->Send());
+		}
+
+	/**
+	* recherche la présence d'un token donné dans la BD pour un utilisateur donné
+	* @param $token : le token cherché
+	* @param $user : le nom d'utilisateur correspondant au token
+	* @return boolean
+	*/
+	public function chercheToken($token, $user){
+		$connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
+		$sql = "SELECT user, token, date ";
+		$sql .= "FROM ".PFX."lostPasswd ";
+		$sql .= "WHERE token='$token' AND user='$user' AND date >= NOW() ";
+		$sql .= "LIMIT 1 ";
+
+		$resultat = $connexion->query($sql);
+		$userName = '';
+		if ($resultat) {
+			$resultat->setFetchMode(PDO::FETCH_ASSOC);
+			$ligne = $resultat->fetch();
+			$userName = $ligne['user'];
+			}
+		Application::DeconnexionPDO($connexion);
+		return $userName;
+		}
+
+	/**
+	* Enregistre le mot de passe provenant du formulaire et correspondant à l'utilisateur indiqué
+	* @param array $post : contenu du formulaire
+	* @param string $userName : nom d'utilisateur
+	* @return nombre d'enregistrements réussis (normalement 1)
+	*/
+	public function savePasswd($post){
+		$passwd = isset($post['passwd'])?$post['passwd']:Null;
+		$passwd2 = isset($post['passwd2'])?$post['passwd2']:Null;
+		$token = $post['token'];
+		// confirmation du userName dans la BD (sécurité)
+		$userName = strtoupper($this->chercheToken($post['token'],$post['userName']));
+		$nb = 0;
+		if (($passwd == $passwd2) && ($userName != '') && (strlen($passwd) >= 8)){
+			$passwd = md5($passwd);
+			$connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
+			$sql = "UPDATE ".PFX."profs ";
+			$sql .= "SET mdp = '$passwd' ";
+			$sql .= "WHERE UPPER(acronyme) = '$userName' ";
+			$resultat = $connexion->exec($sql);
+			if ($resultat)
+				$nb=1;
+			// suppression de tous les tokens de cet utilisateur dans la table des mots de passe à récupérer
+			$sql = "DELETE FROM ".PFX."lostPasswd ";
+			$sql .= "WHERE user = '$userName' ";
+			$resultat = $connexion->exec($sql);
+			Application::DeconnexionPDO($connexion);
+			}
+		return $nb;
+		}
 }
 ?>

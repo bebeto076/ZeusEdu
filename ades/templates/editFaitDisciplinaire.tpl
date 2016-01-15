@@ -1,108 +1,83 @@
+<div class="container">
+
 <h2>{$eleve.nom} {$eleve.prenom} | {$eleve.groupe}</h2>
 
 {assign var=contexte value='formulaire'}
+{assign var="tabIndex" value="1" scope="global"}
 
-<h3 style="color:#{$prototype.structure.couleurTexte}; background-color:#{$prototype.structure.couleurFond}">{$prototype.structure.titreFait}</h3>
-{strip}
-<form name="editFaitDisc" id="editFaitDisc" action="index.php" method="POST">
-	<img style="float:right; width:100px" src="../photos/{$eleve.photo}.jpg" alt="{$eleve.matricule}" class="photo draggable" title="{$eleve.prenom} {$eleve.nom}">
+<div id="success"></div>
 
-	{foreach from=$prototype.champs key=unChamp item=data}
-	{if in_array($contexte, explode(',',$data.contextes))}
+<div class="row">
 	
-		{if $data.typeChamp != 'hidden'}
-			<label for="{$unChamp}">{$data.label}</label>
-		{/if}
-		
-		{strip}
-		{if $data.typeChamp == 'text'}
-		<input type="{$data.typeChamp}" name="{$unChamp}" id="{$unChamp}" class="
-				{$data.classCSS} 
-				{if ($data.typeDate == 1)} uneDate{/if}
-				{if ($data.autocomplete == 'O')} autocomplete{/if}
-				" value="{if isset($fait.$unChamp)}{$fait.$unChamp}{/if}"
-			{if $data.size > 0} size="{$data.size}"{/if}
-			{if $data.maxlength > 0} maxlength="{$data.maxlength}"{/if}
-			{if $data.colonnes > 0} cols="{$data.colonnes}"{/if}
-			{if $data.lignes > 0} rows="{$data.lignes}"{/if}>
-			{if $unChamp == 'professeur'} <span id="nomPrenom"></span>{/if}
-			<br>
-		{/if}
-		{/strip}
-		
-		{strip}
-		<span class="textEtMemo">
-		{if $data.typeChamp == 'textarea'}
-			<textarea {if $data.colonnes > 0}cols="{$data.colonnes}" {/if}
-				{if $data.lignes > 0}rows="{$data.lignes}" {/if}
-				name="{$unChamp}">{if isset($fait.$unChamp)}{$fait.$unChamp}{/if}</textarea>
+	<div class="col-md-10 col-sm-8">
+		<h3 style="color:#{$prototype.structure.couleurTexte}; background-color:#{$prototype.structure.couleurFond}">{$prototype.structure.titreFait}</h3>
+		<form role="form" name="editFaitDisc" id="editFaitDisc" action="index.php" method="POST" class="form-vertical">
 
-				<span class="saveMotif" id="{$unChamp}" title="Enregistrer"><img src="../images/disk.png" alt="xx"></span>
-				<span class="saveOK_{$unChamp}"></span><br>
-
-				{if isset($listeMemos.$unChamp)}
-				<label for="memos_{$unChamp}">^^^^^^^</label>
-				{assign var=liste value=$listeMemos.$unChamp}
-					<select name="memos" class="memos" id="memos_{$unChamp}" style="width:40em">
-						<option value="">Sélectionner un texte</option>
-						{foreach from=$liste key=k item=unMemo}
-						<option value="{$k}">{$unMemo.texte}</option>
-						{/foreach}
-					</select>
-				<a href="javascript:void(0)" class="copier" title="copier le texte"><span ><img src="../images/up.png" alt="^"></span></a>
-				{/if}
-				
-			<br>
-		{/if}
-		</span>
-		{/strip}
-		
-		{strip}
-		{if $data.typeChamp == 'select'}
-			{if $unChamp == 'idretenue'}
-			<input type="hidden" name="oldIdretenue" value="{$fait.idretenue|default:''}">
-			<select name="{$unChamp}" id="{$unChamp}">
-				<option value=''>Choisir une date</option>
-				{foreach from=$listeRetenues key=unidretenue item=uneRetenue}
-					{if $uneRetenue.affiche == 'O'}
-						<option value="{$unidretenue}"{if $uneRetenue.places <= $uneRetenue.occupation} disabled="disabled"{/if}
-						{if isset($fait.idretenue) && ($fait.idretenue == $unidretenue)} selected="selected"{/if}>
-						{$uneRetenue.jourSemaine} {$uneRetenue.dateRetenue} [durée: {$uneRetenue.duree}h à {$uneRetenue.heure}] : {$uneRetenue.occupation}/{$uneRetenue.places}</option>
+			<button class="btn btn-primary pull-right" type="submit" name="Enregistrer">
+				<span class="glyphicon glyphicon-floppy-disk"></span> Enregistrer
+			</button>
+			
+			<button class="btn btn-default pull-right" type="reset" name="Reset">
+				<span class="glyphicon glyphicon-remove-sign"></span> Annuler
+			</button>
+			<div class="clearfix"></div>
+			
+			{foreach from=$prototype.champs key=unChamp item=data}
+			
+				{if in_array($contexte, explode(',',$data.contextes))}
+	
+					{* -----------------------  gestion des champs de type "text" --------------------------------- *}
+					{if $data.typeChamp == 'text'}
+					{include file="faitDisc/champTexte.inc.tpl"}
 					{/if}
-				{/foreach}
-			</select>
-			{/if}
-			<br>
-		{/if}
-		{/strip}
-		
-		{strip}
-		{if $data.typeChamp == hidden}
-		<input type="hidden" name="{$unChamp}" id="{$unChamp}" {if $unChamp == 'qui'}
-				value="{$identite.acronyme}"
-				{elseif $unChamp == 'matricule'}
-				value="{$eleve.matricule}"
-				{elseif $unChamp == 'type'}
-				value="{$prototype.structure.type}"
-				{else} value="{if isset($fait.$unChamp)}{$fait.$unChamp}{/if}"
-			   {/if}>
-		{/if}
-		{/strip}
-		
-	{/if}
+					
+					{* -----------------------  gestion des champs de type "textarea" --------------------------------- *}
+					{if $data.typeChamp == 'textarea'}
+					{include file="faitDisc/champTextarea.inc.tpl"}
+					{/if}
+								
+					{* -----------------------  gestion des champs de type "select" --------------------------------- *}				
+					{if $data.typeChamp == 'select'}
+					{include file="faitDisc/champSelect.inc.tpl"}
+					{/if}
 	
-	{/foreach}
-	<input type="submit" name="submit" value="Enregistrer">
-	<input type="reset" name="reset" value="Annuler">
-	<a href="index.php?action=eleves&amp;classe={$classe}&amp;matricule={$matricule}" style="float:right"><span class="fauxBouton">Retour sans enregistrer</span></a>
-	<input type="hidden" name="classe" value="{$eleve.groupe}">
-	<input type="hidden" name="action" value="{$action}">
-	<input type="hidden" name="mode" value="{$mode}">
+					{* -----------------------  gestion des champs de type "hidden" --------------------------------- *}
+					{if $data.typeChamp == hidden}			
+					{include file="faitDisc/champHidden.inc.tpl"}
+					{/if}
+				
+				{/if}  {*  in_array *}
 
-</form>
+			{/foreach}
+			
+			{assign var="tabIndex" value=$tabIndex+1 scope="global"}
+			<div class="clearfix"></div>
+			
+			<a href="index.php?action=eleves&amp;classe={$classe}&amp;matricule={$matricule}" class="btn btn-primary pull-right" tabIndex="{$tabIndex}">
+				<span class="glyphicon glyphicon-arrow-left"></span> Retour sans enregistrer</a>
+			
+			<input type="hidden" name="anneeScolaire" value="{$fait.anneeScolaire}">
+			<input type="hidden" name="classe" value="{$eleve.groupe}">
+			<input type="hidden" name="action" value="{$action}">
+			<input type="hidden" name="mode" value="{$mode}">
+		
+		</form>
+
+	</div>  <!-- col-md.... -->
+	
+	<div class="col-md-2 col-sm-4">
+		
+		<img src="../photos/{$eleve.photo}.jpg" alt="{$matricule}" class="photo img-responsive thumbnail" title="{$eleve.prenom} {$eleve.nom}">
+			
+	</div>
+
+</div>  <!-- row -->
+
+
+</div> <!-- container -->
 
 <script type="text/javascript">
-{literal}
+
 $.validator.addMethod(
     "dateFr",
     function(value, element) {
@@ -143,90 +118,95 @@ $(document).ready(function(){
 	$("#editFaitDisc").validate({
 			rules: {
 				idretenue: {
-					required:true
+
 					},
 				uneDate: {
-					required:true,
 					uneDate: true
 					},
 				motif: {
-					required: true
+
 					}
 				},
 			errorElement: "span"
 			}
 	)
-	
-	$("#ladate").datepicker({ 
-		dateFormat: "dd/mm/yy",
-		prevText: "",
-		nextText: "",
-		monthNames: ["Janvier","Février","Mars","Avril","Mai","Juin","Juillet","Août","Septembre","Octobre","Novembre","Décembre"],
-		dayNames: [ "Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi" ],
-		dayNamesMin: ["Di", "Lu", "Ma", "Me", "Je", "Ve", "Sa"],
-		firstDay: 1	
-		});
 
-	$('#timepicker').timepicker({
-		hourText: 'Heures',
-		minuteText: 'Minutes',
-		amPmText: ['AM', 'PM'],
-		timeSeparator: ':',
-		nowButtonText: 'Maintenant',
-		showNowButton: true,
-		closeButtonText: 'OK',
-		showCloseButton: true,
-		deselectButtonText: 'Désélectionner',
-		showDeselectButton: true,
-		hours: {starts: 8, ends: 17},
-		showDeselectButton: false
+	$("#ladate").datepicker({
+		clearBtn: true,
+		language: "fr",
+		calendarWeeks: true,
+		autoclose: true,
+		todayHighlight: true
 		});
 
 	$(".saveMotif").css("cursor","pointer");
-	
+
 	$(".saveMotif").click(function(){
-		var test = $(this);
-		var texte = $(this).prev().val();
-		var qui = $("form").find("input#qui").val();
-		var champ = $(this).attr("id");
-		
+		var texte = $(this).closest('.row').find('div').find('textarea').val();
+		var qui = $("#qui").val();
+		var champ = $(this).closest('.row').find('textarea').attr("id");
+
 		if (texte != '') {
-			$.post("inc/saveTexte.inc.php",
-				{'texte': texte,
+			// ajouter le texte dans le sélecteur
+			var newId = $(this).closest('.row').find('option').length;
+			var target = $(this).closest('.row').find('select');
+			var o = new Option(texte, newId);
+			target.append(o);
+			// enregistrer dans la BD
+			
+			$.post("inc/saveTexte.inc.php", {
+				'texte': texte,
 				 'qui': qui,
-				 'champ': champ},
+				 'champ': champ
+				 },
 					function (resultat) {
-						$(this).next().html(resultat).show();
+						$("#success").html(resultat);
 						}
 					);
 		}
 		$(this).hide();
 		})
-	
-	$(".textEtMemo textarea").keyup(function(){
-		$(this).parent().find(".saveMotif").show();
-		})
-	
-	$(".copier").click(function(){
+
+	$("textarea").keyup(function(){
 		var test = $(this);
-		var ajout = $(this).parent().find("select option:selected").text();
-		var texte = $(this).parent().find("textarea").val();
-		texte = texte + " " + ajout;
-		$(this).parent().find("textarea").val(texte);
-		$(this).parent().find(".saveMotif").show();	
+		$(this).closest('.row').find('span.saveMotif').show();
 		})
-	
+
+	$(".copier").click(function(){
+		var toto = $(this);
+		var id = $(this).closest('.row').find("select option:selected").val();
+		if (id != '') {
+			var ajout = $(this).closest('.row').find('select option:selected').text();
+			var texte = $(this).closest('.row').find('textarea').val();
+			texte = texte + " " + ajout;
+			$(this).parent().find("textarea").val(texte);
+			$(this).parent().find(".saveMotif").show();
+			}
+		})
+
+	$(".memos").change(function(){
+		var id = $(this).find('option:selected').val();
+		if (id != '') {
+			var ajout = $(this).find('option:selected').text();
+			var texte = $(this).closest('.row').find('textarea').val();
+			texte = texte + " " + ajout;
+			$(this).parent().find("textarea").val(texte);
+			$(this).parent().find(".saveMotif").show();
+			}
+		})
+
+		
 	$("#professeur").blur(function(){
 		var acronyme = $(this).val().toUpperCase();
 		$(this).val(acronyme);
 		if (acronyme != '') {
 			$.post("inc/nomPrenom.inc.php",
-				{'acronyme': acronyme},
+				{ 'acronyme': acronyme },
 				function(resultat) {
 					$("#nomPrenom").html(resultat)
 					});
 			}
 			})
 })
-{/literal}
+
 </script>

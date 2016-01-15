@@ -1,10 +1,9 @@
 <?php
 $typeRetenue = isset($_POST['typeRetenue'])?$_POST['typeRetenue']:Null;
 $smarty->assign('typeRetenue',$typeRetenue);
-$listeRetenues = isset($typeRetenue)?$Ades->listeRetenues($typeRetenue, true):Null;
-$smarty->assign('listeRetenues',$listeRetenues);
 $listeTypes = $Ades->getTypesRetenues();
 $smarty->assign('listeTypes',$listeTypes);
+
 require_once(INSTALL_DIR."/ades/inc/classes/classRetenue.inc.php");
 
 switch ($mode) {
@@ -13,46 +12,46 @@ switch ($mode) {
 			case 'showListe':
 				$idretenue = isset($_POST['idretenue'])?$_POST['idretenue']:Null;
 				if (isset($idretenue)) {
-					$smarty->assign('action',$action);
-					$smarty->assign('mode',$mode);
 					$smarty->assign('etape',$etape);
 					$smarty->assign('idretenue',$idretenue);
+					$listeRetenues = $Ades->listeRetenues($typeRetenue, true);
+
+					$smarty->assign('listeRetenues',$listeRetenues);
 					$infosRetenue = $Ades->infosRetenue($idretenue);
 					$smarty->assign('infosRetenue',$infosRetenue);
-					$listeElevesRetenue = $Ades->listeElevesRetenue ($idretenue);
+					$listeElevesRetenue = $Ades->listeElevesRetenue($idretenue);
 					$smarty->assign('listeEleves',$listeElevesRetenue);
 					$smarty->assign('selecteur','selectRetenueDate');
 					$smarty->assign('corpsPage','listeElevesRetenue');
 				}
 				break;
 			default:
-			$smarty->assign('action',$action);
-			$smarty->assign('mode',$mode);
-			$smarty->assign('etape','showListe');
-			$smarty->assign('selecteur','selectRetenueDate');
-			break;
+				$smarty->assign('etape','showListe');
+				$smarty->assign('selecteur','selectRetenueDate');
+				break;
 		}
-		
+		$smarty->assign('action',$action);
+		$smarty->assign('mode',$mode);		
 		break;
 	case 'dates':
-		$smarty->assign('selecteur', 'selectTypeRetenue');
-		$smarty->assign('action',$action);
-		$smarty->assign('mode',$mode);
+		$smarty->assign('selecteur','selectTypeRetenue');
 		if (isset($typeRetenue)) {
 			$listeRetenues = $Ades->listeRetenues($typeRetenue, false);
 			$smarty->assign('listeRetenues',$listeRetenues);
 			$infosRetenue = $Ades->infosRetenueType($typeRetenue);
-			$smarty->assign('infosRetenue', $infosRetenue);
+			$smarty->assign('infosRetenue',$infosRetenue);
 			$smarty->assign('corpsPage','listesRetenues');
-		}
+			}
+		$smarty->assign('action',$action);
+		$smarty->assign('mode',$mode);
 		break;
 	case 'edit':
+		$typeRetenue = isset($_REQUEST['typeRetenue'])?$_REQUEST['typeRetenue']:Null;
 		$idretenue = isset($_REQUEST['idretenue'])?$_REQUEST['idretenue']:Null;
-		$retenue = new Retenue($idretenue);
-		$typeRetenue = $retenue->get('type');
-		$smarty->assign('typeRetenue', $typeRetenue);
+		$retenue = current((array) new Retenue($idretenue));
 		$smarty->assign('idretenue',$idretenue);
-		$smarty->assign('retenue', $retenue);
+		$smarty->assign('typeRetenue',$typeRetenue);
+		$smarty->assign('retenue',$retenue);
 		$smarty->assign('action',$action);
 		$smarty->assign('corpsPage','editRetenue');
 		break; 
@@ -61,49 +60,28 @@ switch ($mode) {
 		$idretenue = $Retenue->saveRetenue($_POST);
 		$smarty->assign("message", array(
 					'title'=>"Enregistrement",
-					'texte'=>"Retenue enregistrée")
+					'texte'=>"Retenue enregistrée",
+					'urgence'=>'success'
+					)
 					);
-
 		// relire dans la BD
 		$Retenue->lireRetenue($idretenue);
-		$smarty->assign('action',$action);
-		$smarty->assign('mode','liste');
 		$typeRetenue = $Retenue->get('type');
-		$smarty->assign('selecteur', 'selectTypeRetenue');
-		$smarty->assign('action',$action);
-		$smarty->assign('mode','dates');
+		// après enregistrement, relire la table pour avoir toutes les retenues, y compris la dernière enregistrée
 		if (isset($typeRetenue)) {
-			$listeRetenues = $Ades->listeRetenues($typeRetenue, false);
-			$smarty->assign('type',$typeRetenue);
+			$listeRetenues = $Ades->listeRetenues($typeRetenue);
 			$smarty->assign('listeRetenues',$listeRetenues);
+			$smarty->assign('type',$typeRetenue);
 			$infosRetenue = $Ades->infosRetenueType($typeRetenue);
 			$smarty->assign('infosRetenue', $infosRetenue);
 			$smarty->assign('corpsPage','listesRetenues');
 		}
-		break;
-	case 'del':
-		$idretenue = isset($_REQUEST['idretenue'])?$_REQUEST['idretenue']:Null;
-		$Retenue = new Retenue($idretenue);
-		$typeRetenue = $Retenue->get('type');
-		$smarty->assign('typeRetenue',$typeRetenue);
-		$nb = $Retenue->delRetenue();
-		$smarty->assign("message", array(
-			'title'=>"Enregistrement",
-			'texte'=>"Retenue supprimée")
-			);
+		$smarty->assign('selecteur', 'selectTypeRetenue');
 		$smarty->assign('action',$action);
 		$smarty->assign('mode','dates');
-		$smarty->assign('selecteur', 'selectTypeRetenue');
-		$listeRetenues = $Ades->listeRetenues($typeRetenue, false);
-		$smarty->assign('listeRetenues',$listeRetenues);
-		$infosRetenue = $Ades->infosRetenueType($typeRetenue);
-		$smarty->assign('infosRetenue', $infosRetenue);
-		$smarty->assign('corpsPage','listesRetenues');
 		break;
 	default:
 		// wtf
 		break;
-	
 	}
-
 ?>

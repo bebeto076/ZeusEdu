@@ -1,169 +1,170 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta charset="utf-8">
 <title>{$titre}</title>
-
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="menu.css" type="text/css" media="screen">
+<link type="text/css" media="all" rel="stylesheet" href="bootstrap/css/bootstrap.css">
+
+<script type="text/javascript" src="js/jquery-2.1.3.min.js"></script>
+<script type="text/javascript" src="bootstrap/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="js/jquery.validate.js"></script>
+
 <link rel="stylesheet" href="screen.css" type="text/css" media="screen">
 <link rel="stylesheet" href="print.css" type="text/css" media="print">
-<link rel="stylesheet" href="js/jquery-ui-themes-1.10.3/themes/sunny/jquery-ui.css" media="screen, print">
-<link rel="stylesheet" href="js/ymtooltip.css" type="text/css" media="screen,print">
-  
-<script type="text/javascript" src="js/jquery-1.10.2.min.js"></script>
-<script type="text/javascript" src="js/jquery.form.js"></script>
-<script type="text/javascript" src="js/jquery.validate.js"></script>
-<script type="text/javascript" src="js/jquery.blockUI.js"></script>
-<script type="text/javascript" src="js/jquery.enter2tab.js"></script>
-<script type="text/javascript" src="js/toTop/jquery.ui.totop.js"></script>
-<script type="text/javascript" src="js/menuBas.js"></script>
-<script type="text/javascript" src="js/toTop/jquery.easing.1.3.js"></script>
-<script type="text/javascript" src="js/jquery-ui-1.10.3/ui/minified/jquery-ui.min.js"></script>
-<script type="text/javascript" src="js/jquery.align.js"></script>
-<script type="text/javascript" src="js/jquery.ymtooltip.js"></script>
 
 </head>
 <body>
-<div id="javascriptOff">
-	<h3>Attention!</h3>
-	<p>vous avez désactivé Javascript dans votre navigateur.</p>
-	<p><strong>L'application ne fonctionnera pas!!</strong></p>
-	<p><strong>Veuillez réactiver Javascript ou contacter votre administrateur.</strong></p>
-</div>
-<fieldset style="display: none; width:45em;" id="cadreFieldset" class="photo">
-    <legend>Veuillez vous identifier</legend>
-    <h1>{$titre}</h1>
-    <form autocomplete="off" method="post" id="login" action="login.php" name="login">
-        <p><label for="acronyme">Utilisateur</label>
-        <input maxlength="3" size="5" name="acronyme" id="acronyme" tabindex="1" title="Au moins trois caractères">
-        </p>
-        <p><label for="mdp">Mot de passe</label>
-        <input maxlength="20" size="10" name="mdp" id="mdp" type="password" tabindex="2" title="Au moins six caractères"></p>
-        <p><a href="javascript:void(0)" id="renvoimdp" title="Récupérer un mot de passe">Ciel! J'ai oublié mon mot de passe</a></p>
-        <p style="text-align: center"> <input value="Entrer" type="submit" tabindex="3" /></p>
-    </form>
-	
-	<div id="dialogueRenvoiMdp" title="Nouveau mot de passe">
-		<p>Voulez-vous recevoir un nouveau mot de passe pour <strong id="acro"></strong> sur votre adresse e-mail professionnelle?</p>
-	</div>
 
-<fieldset>
-	<legend> Avertissement!</legend> 
-	<p style="color:red"><img src="images/attention.png" alt="/!\" style="float:left; padding-right:1em">
-	<P class="tooltip">
-		<span class="tip">"Celui qui, sachant qu'il n'y est pas autorisé, accède à un système informatique ou s'y maintient, est puni d'un emprisonnement de trois mois à un an et d'une amende de vingt-six [euros] à vingt-cinq mille [euros] ou d'une de ces peines seulement."<br>(voir http://www.ejustice.just.fgov.be).</span>
-	Cette application gère des données privées et strictement confidentielles. Toute tentative d'accès sans autorisation est punissable au sens de la loi 
-	(<a href="http://www.ejustice.just.fgov.be/cgi_loi/change_lg.pl?language=fr&la=F&table_name=loi&cn=1867060801" target="_blank">Art. 550 bis du Code Pénal</a>).</p>
-	<p>Votre adresse IP: <strong>{$identification.ip}</strong> {$identification.hostname}. Votre passage est enregistré.</p>
-</fieldset>
+<div class="container">
 
-	<div id="alertUserName" title="Erreur">
-		Veuillez fournir votre nom d'utilisateur
-	</div>
-	
-	<div id="inconnu" title="Erreur"></div>
-	
-	<div id="messageErreur" title="Erreur">
-		<p>Nom d'utilisateur ou mot de passe incorrect</p>
-		<p>Votre tentative d'accès, votre adresse IP et le nom de votre fournisseur d'accès ont été enregistrés.</p>
-		<p>Les administrateurs ont été prévenus.</p>
-	</div>	
+	<div class="vertical-align">
+
+	<div class="row">
+
+		{if (isset($message) && $message == 'logout')}
+		<div class="alert alert-dismissible alert-success auto-fadeOut">
+			<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+			<p>Votre session est terminée. Veuillez vous reconnecter pour poursuivre le travail.</p>
+		</div>
+		{/if}
+
+		{if (isset($message) && $message == 'erreurMDP')}
+		<div class="alert alert-dismissable alert-danger">
+			<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+			<p>Nom d'utilisateur ou mot de passe incorrect</p>
+			<p>Votre tentative d'accès, votre adresse IP et le nom de votre fournisseur d'accès ont été enregistrés.</p>
+			<p>Les administrateurs ont été prévenus.</p>
+		</div>
+		{/if}
+
+		<div class="col-md-offset-1 col-md-5 col-sm-12">
+
+			<h4>{$titre}</h4>
+
+			<form class="form-vertical" role="form" id="login" action="login.php" method="POST">
+				<div class="panel panel-default">
+
+					<div class="panel-heading">
+						<h4 class="panel-title">Veuillez vous identifier</h4>
+					</div>
+
+					<div class="panel-body">
+					<div class="form-group">
+						<label for="name" class="control-label sr-only">Nom d'utilisateur</label>
+						<input type="text" id="acronyme" name="acronyme" class="form-control input-lg" placeholder="Nom d'utilisateur" value="{$acronyme}" autocomplete="off">
+						<span class="help-group">En 7 lettres (max)</span>
+					   </div>
+
+					<div class="form-group">
+						<label for="name" class="control-label sr-only">Mot de passe</label>
+							<input type="password" id="mdp" name="mdp" class="form-control input-lg" placeholder="Mot de passe" value="{$mdp}" autocomplete="off">
+							<span class="help-group">Au moins 6 caractères</span>
+					   </div>
+
+					<br class="clearfix">
+						<div class="btn-group pull-right">
+							<button class="btn btn-default btn-lg" type="reset">Annuler</button>
+							<button class="btn btn-primary btn-lg" type="submit">Connexion</button>
+						</div>
+					</div>  <!-- panel-body -->
+
+					<div class="panel-footer">
+						<a href="mdp/index.php">Ciel! J'ai perdu mon mot de passe</a>
+					</div>
+
+				</div>  <!-- panel -->
+			</form>
+
+		</div>  <!-- col-md- -->
+
+		<div class="col-md-5 col-sm-12">
+			<h4>Avertissement!</h4>
+			<p><span class="glyphicon glyphicon-warning-sign" style="font-size:2em"></span> Cette application gère des données privées et strictement confidentielles. Toute tentative d'accès sans autorisation est <a href="#" id="popModal" title="Cliquer pour plus d'informations">punissable au sens de la Loi</a>.
+			<p><span class="glyphicon glyphicon-eye-open" style="font-size:2em"></span> Votre adresse IP: {$identification.ip}. Votre passage est enregistré.</p>
+		</div>  <!-- col-md -->
+
+	</div>  <!-- row -->
+
+	<div class="modal fade" id="rappelLoi" tabindex="-1" role="dialog" aria-labelledby="rappelLoi" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+				<h4>Rappel de la Loi</h4>
+				</div>
+				<div class="modal-body">
+					{include file="texteLoi.html"}
+				</div>  <!-- modal-body -->
+				<div class="modal-footer">
+					<button type="button" class="btn btn-primary" data-dismiss="modal">J'ai bien compris</button>
+				</div>  <!-- modal-footer -->
+			</div>  <!-- modal-content -->
+		</div>  <!-- modal-dialog -->
+	</div>  <!-- rappelLoi -->
+
+
+		</div>  <!-- vertical-align -->
+
+	</div>  <!-- container -->
 
 {include file="footer.tpl"}
+
 <script type="text/javascript">
-{literal}
-var close = "Fermer";
+
+window.setTimeout(function() {
+    $(".auto-fadeOut").fadeTo(500, 0).slideUp(500, function(){
+        $(this).remove();
+	    });
+	}, 3000);
 
 $(document).ready (function() {
-	
-	$("#javascriptOff").hide();
-	$("#cadreFieldset").show();
-	$("#cadreFieldset").vAlign().hAlign();
-	
+
 	$("input:enabled").eq(0).focus();
-	
+
+	$("input").not(".autocomplete").attr("autocomplete","off");
+
 	$("#login").validate({
 		rules: {
-			acronyme: {required:true, minlength:3},
-			mdp: {required:true,minlength:6}
-			},
-		errorElement: "span"
-		});
-	
-	$("#alertUserName").dialog({
-		autoOpen: false,
-		modal: true,
-		closeText: close,
-		buttons: {
-			"OK": function(){
-				$(this).dialog("close");
-				}
-			}
-		})
-	
-	$("#messageErreur").dialog({
-		autoOpen: false,
-		modal: true,
-		width: 500,
-		closeText: close,
-		buttons: {
-			"Ok": function() {
-				$(this).dialog("close");
-				}
-		}
-		})
-	$("#inconnu").dialog({
-		autoOpen: false,
-		modal: true,
-		closeText: close,
-		buttons: {
-			"Ok": function() {
-				$(this).dialog("close");
-				}
-			}
-		})
-	
-	
-	$("#renvoimdp").click(function(){
-		var acronyme = $("#acronyme").val().toUpperCase();
-		if (acronyme == "")
-			$("#alertUserName").dialog("open");
-			else {
-				$("#acro").text(acronyme);
-				$("#dialogueRenvoiMdp").dialog("open");
-				}
-		return false;
-		});
-
-	$("#dialogueRenvoiMdp").dialog({
-		autoOpen: false,
-		width: 500,
-		buttons: {
-			"Non": function() {
-				$(this).dialog("close");
+			acronyme: {
+				required:true,
+				minlength:3,
+				maxlength:7
 				},
-			"Oui": function() {
-				var acronyme = $("#acronyme").val();
-				$.get('inc/renvoimdp.inc.php',
-					  {'acronyme': acronyme.toUpperCase()},
-					  function (resultat) {
-						$("#inconnu").text(resultat);
-						$("#inconnu").dialog("open");
-						}
-					  )
-				$(this).dialog("close");
+			mdp: {
+				required:true,
+				minlength:6
 				}
+			},
+		errorElement: 'span',
+		errorClass: 'error'
+		})
+
+	$(".pop").popover({ trigger:'hover' });
+
+	$("#popModal").click(function(){
+		$("#rappelLoi").modal('show');
+		})
+
+	$("#okRenvoi").click(function(){
+		var acronyme = $("#acro").val().toUpperCase();
+		if (acronyme != '') {
+			$.post('inc/renvoimdp.inc.php', {
+				acronyme: acronyme
+				},
+				function(resultat) {
+					$("#dialogueRenvoiMdp").modal('hide');
+					$("#infoMDP").find('.mdp').text(resultat);
+					$("#infoMDP").show();
+					}
+				)
 			}
 		})
-		
+
 	$("*[title], .tooltip").tooltip();
-		
-	var erreur = document.location.search;
-	if (erreur.indexOf("faux") > 0)
-		$("#messageErreur").dialog("open");
-		
+
 	})
-{/literal}
+
 </script>
+
 </body>
 </html>
